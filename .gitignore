@@ -1,6 +1,7 @@
 # See https://www.dartlang.org/guides/libraries/private-files
 
 # If you're building an application, you may want to check-in your pubspec.lock
+lib/firebase_options.dart
 pubspec.lock
 
 # Directory created by dartdoc
