@@ -13,11 +13,24 @@ dependencies:
   firebase_core: ^1.17.1
   flutter:
     sdk: flutter
+  get: ^4.6.5
 
 dev_dependencies:
+  flutter_launcher_icons: 
+   git:
+     url: https://github.com/Davenchy/flutter_launcher_icons.git
+     ref: fixMinSdkParseFlutter2.8
+
   flutter_lints: ^2.0.0
   flutter_test:
     sdk: flutter
+
+flutter_icons:
+  image_path: "assets/icon/icon.png"
+  android: true
+  ios: true
+  adaptive_icon_background: "#00500E"
+  adaptive_icon_foreground: "assets/icon/icon_fore.png"
 
 flutter:
   uses-material-design: true
