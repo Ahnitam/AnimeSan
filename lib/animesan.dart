@@ -1,3 +1,4 @@
+import 'package:animesan/views/home_view.dart';
 import 'package:flutter/material.dart';
 
 class AnimeSan extends StatelessWidget {
@@ -17,6 +18,7 @@ class AnimeSan extends StatelessWidget {
         scaffoldBackgroundColor: Colors.black,
       ),
       themeMode: ThemeMode.dark,
+      home: Home(),
     );
   }
 }
