@@ -59,7 +59,7 @@ class SearchButtom extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                     decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.fromLTRB(12.0, 10, 0.0, 0.0),
+                      contentPadding: const EdgeInsets.fromLTRB(0, 10, 5, 0.0),
                       isDense: true,
                       labelText: label,
                       labelStyle: const TextStyle(
