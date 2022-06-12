@@ -51,9 +51,22 @@ class AnimeCard extends StatelessWidget {
                     padding: imagePadding ? EdgeInsets.only(top: padding, bottom: padding, left: padding) : const EdgeInsets.all(0),
                     child: ClipRRect(
                       borderRadius: imageRadius || imagePadding ? BorderRadius.circular(radius) : BorderRadius.zero,
-                      child: Image.network(
-                        anime.imageUrl!,
+                      child: FadeInImage.assetNetwork(
+                        placeholder: "assets/loading.gif",
+                        placeholderFit: BoxFit.none,
+                        placeholderScale: 6,
+                        image: anime.imageUrl!,
+                        fit: BoxFit.cover,
                         height: double.infinity,
+                        width: ((imagePadding ? height - (padding * 2) : height) * 240) / 360,
+                        imageErrorBuilder: (context, obj, error) {
+                          return Image.asset(
+                            "assets/sem_imagem.png",
+                            height: double.infinity,
+                            width: ((imagePadding ? height - (padding * 2) : height) * 240) / 360,
+                            fit: BoxFit.cover,
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -67,16 +80,20 @@ class AnimeCard extends StatelessWidget {
                         children: [
                           SizedBox(
                             width: double.infinity,
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              physics: const BouncingScrollPhysics(),
-                              child: Text(
-                                anime.titulo,
-                                maxLines: 1,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                            child: Center(
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                physics: const BouncingScrollPhysics(),
+                                child: Text(
+                                  anime.titulo,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  style: const TextStyle(
+                                    fontFamily: "Bree Serif",
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ),
@@ -90,8 +107,9 @@ class AnimeCard extends StatelessWidget {
                               physics: const BouncingScrollPhysics(),
                               child: Text(
                                 anime.descricao,
-                                textAlign: TextAlign.justify,
+                                textAlign: TextAlign.center,
                                 style: const TextStyle(
+                                  fontFamily: "Bree Serif",
                                   color: Color.fromARGB(255, 167, 167, 167),
                                   fontSize: 10,
                                 ),

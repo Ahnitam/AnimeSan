@@ -3,20 +3,22 @@ import 'package:flutter/material.dart';
 class CustomButtom extends StatelessWidget {
   final Widget child;
   final double? width;
-  final double height;
-  final double fontSize;
+  final double? height;
   final Color? color;
+  final bool splashEnabled;
   final VoidCallback? onPressed;
   late final BorderRadius borderRadius;
+  final EdgeInsets padding;
 
   CustomButtom({
     Key? key,
     required this.child,
-    this.onPressed,
-    this.fontSize = 10,
+    this.height,
     this.width,
-    required this.height,
+    this.splashEnabled = true,
+    this.onPressed,
     this.color,
+    this.padding = EdgeInsets.zero,
     BorderRadius? borderRadius,
   }) : super(key: key) {
     this.borderRadius = borderRadius ?? BorderRadius.circular(20);
@@ -31,6 +33,13 @@ class CustomButtom extends StatelessWidget {
         height: height,
         width: width,
         child: RawMaterialButton(
+          constraints: const BoxConstraints(
+            minWidth: 0,
+            minHeight: 0,
+          ),
+          highlightColor: splashEnabled ? null : Colors.transparent,
+          splashColor: splashEnabled ? null : Colors.transparent,
+          padding: padding,
           onPressed: onPressed,
           child: child,
         ),

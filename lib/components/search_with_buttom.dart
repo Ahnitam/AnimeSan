@@ -36,10 +36,11 @@ class SearchButtom extends StatelessWidget {
           child: Row(
             children: [
               CustomButtom(
-                width: 70,
-                color: color,
-                borderRadius: BorderRadius.zero,
                 height: double.infinity,
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                color: Colors.transparent,
+                splashEnabled: false,
+                borderRadius: BorderRadius.zero,
                 onPressed: () {
                   textBuscarController.clear();
                 },
@@ -54,6 +55,7 @@ class SearchButtom extends StatelessWidget {
                     controller: textBuscarController,
                     textAlignVertical: TextAlignVertical.bottom,
                     style: const TextStyle(
+                      fontFamily: "Bree Serif",
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -63,6 +65,7 @@ class SearchButtom extends StatelessWidget {
                       isDense: true,
                       labelText: label,
                       labelStyle: const TextStyle(
+                        fontFamily: "Bree Serif",
                         color: Colors.white,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -83,18 +86,15 @@ class SearchButtom extends StatelessWidget {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(),
-                child: CustomButtom(
-                  borderRadius: BorderRadius.zero,
-                  width: 70,
-                  height: double.infinity,
-                  color: searchButtomColor,
-                  onPressed: () => onSubmit(textBuscarController.text),
-                  child: const Icon(
-                    Icons.search_rounded,
-                    color: Colors.black,
-                  ),
+              CustomButtom(
+                borderRadius: BorderRadius.zero,
+                height: double.infinity,
+                width: 70,
+                color: searchButtomColor,
+                onPressed: () => onSubmit(textBuscarController.text),
+                child: const Icon(
+                  Icons.search_rounded,
+                  color: Colors.black,
                 ),
               )
             ],
