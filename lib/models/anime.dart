@@ -5,7 +5,8 @@ class Anime {
   final String titulo;
   final String descricao;
   final String streamId;
-  String? imageUrl;
+  final String streamName;
+  final String imageUrl;
   late final List<Temporada> temporadas;
 
   Anime({
@@ -13,18 +14,28 @@ class Anime {
     required this.titulo,
     required this.descricao,
     required this.streamId,
-    this.imageUrl,
+    required this.streamName,
+    required this.imageUrl,
     List<Temporada>? temporadas,
   }) {
     this.temporadas = temporadas ?? List.empty(growable: true);
   }
 
-  Anime copyWith({String? id, String? titulo, String? descricao, String? streamId, String? imageUrl, List<Temporada>? temporadas}) {
+  Anime copyWith({
+    String? id,
+    String? titulo,
+    String? descricao,
+    String? streamId,
+    String? imageUrl,
+    List<Temporada>? temporadas,
+    String? streamName,
+  }) {
     return Anime(
       id: id ?? this.id,
       titulo: titulo ?? this.titulo,
       descricao: descricao ?? this.descricao,
       streamId: streamId ?? this.streamId,
+      streamName: streamName ?? this.streamName,
       imageUrl: imageUrl ?? this.imageUrl,
       temporadas: temporadas ?? this.temporadas,
     );
