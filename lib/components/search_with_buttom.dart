@@ -11,11 +11,13 @@ class SearchButtom extends StatelessWidget {
   final Widget? buscadorIcon;
   final EdgeInsets margin;
   final void Function(String) onSubmit;
+  final void Function() onClickLeading;
 
   SearchButtom({
     Key? key,
     required this.label,
     required this.onSubmit,
+    required this.onClickLeading,
     this.radius = 25,
     this.height = 50,
     this.color = const Color.fromARGB(255, 33, 33, 33),
@@ -39,11 +41,9 @@ class SearchButtom extends StatelessWidget {
                 height: double.infinity,
                 padding: const EdgeInsets.only(left: 10, right: 10),
                 color: Colors.transparent,
-                splashEnabled: false,
+                splashEnabled: true,
                 borderRadius: BorderRadius.zero,
-                onPressed: () {
-                  textBuscarController.clear();
-                },
+                onPressed: onClickLeading,
                 child: buscadorIcon ?? const Icon(Icons.warning_rounded, color: Colors.red),
               ),
               Expanded(

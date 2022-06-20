@@ -1,3 +1,4 @@
+import 'package:animesan/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomButtom extends StatelessWidget {
@@ -7,10 +8,10 @@ class CustomButtom extends StatelessWidget {
   final Color? color;
   final bool splashEnabled;
   final VoidCallback? onPressed;
-  late final BorderRadius borderRadius;
+  final BorderRadius borderRadius;
   final EdgeInsets padding;
 
-  CustomButtom({
+  const CustomButtom({
     Key? key,
     required this.child,
     this.height,
@@ -19,17 +20,15 @@ class CustomButtom extends StatelessWidget {
     this.onPressed,
     this.color,
     this.padding = EdgeInsets.zero,
-    BorderRadius? borderRadius,
-  }) : super(key: key) {
-    this.borderRadius = borderRadius ?? BorderRadius.circular(20);
-  }
+    this.borderRadius = const BorderRadius.all(Radius.circular(10)),
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: borderRadius,
       child: Container(
-        color: color ?? const Color.fromARGB(169, 27, 94, 31),
+        color: color ?? appPrimaryColor,
         height: height,
         width: width,
         child: RawMaterialButton(
