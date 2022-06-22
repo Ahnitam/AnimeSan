@@ -8,7 +8,7 @@ class ModuleController {
   final List<Module> _modules = [CrunchyrollModule()];
   late final SharedPreferences _prefer;
 
-  late Rx<StreamModule?> _selectedStreamModule;
+  Rx<StreamModule?> _selectedStreamModule = null.obs;
   StreamModule? _streamPadrao;
   InfoModule? _infoPadrao;
 
@@ -20,17 +20,17 @@ class ModuleController {
   void _verifyModules() {
     // String _streamPadrao = _moduleController.getStreamModuleById(_prefer.getString("idStreamPadrao"), enabledOnly: true);
     for (var module in modules) {
-      if (module is StreamModule && module.id == _prefer.getString("idStreamPadrao") && module.isEnabled) {
-        _streamPadrao = module;
-        _selectedStreamModule = module.obs;
-      }
-      if (module is InfoModule && module.id == _prefer.getString("idInfoPadrao") && module.isEnabled) {
-        _infoPadrao = module;
-      }
       module.isEnabled = _prefer.getBool(
             "${module is StreamModule ? "stream" : module is InfoModule ? "info" : throw Exception("Modulo não suportado")}_${module.id}_isEnabled",
           ) ??
           false;
+
+      if (module is StreamModule && module.id == _prefer.getString("idStreamPadrao") && module.isEnabled) {
+        _streamPadrao = module;
+        _selectedStreamModule = module.obs;
+      } else if (module is InfoModule && module.id == _prefer.getString("idInfoPadrao") && module.isEnabled) {
+        _infoPadrao = module;
+      }
     }
   }
 
