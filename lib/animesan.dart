@@ -21,10 +21,10 @@ class AnimeSan extends StatelessWidget {
       ),
       themeMode: ThemeMode.dark,
       initialRoute: "/",
-      routes: {
-        "/": (context) => Home(),
-        "/config": (context) => const Config(),
-      },
+      getPages: [
+        GetPage(name: "/", page: () => Home()),
+        GetPage(name: "/config", page: () => const Config()),
+      ],
     );
   }
 }
