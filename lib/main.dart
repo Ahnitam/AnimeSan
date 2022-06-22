@@ -15,6 +15,6 @@ Future<void> dependencies() async {
   WidgetsFlutterBinding.ensureInitialized();
   final SharedPreferences prefer = Get.put<SharedPreferences>(await SharedPreferences.getInstance());
   final ModuleController moduleController = Get.put<ModuleController>(ModuleController(prefer: prefer));
-  Get.put(SettingsController(moduleController: moduleController, prefer: prefer));
+  Get.put(SettingsController(prefer: prefer));
   Get.put(LoginController(moduleController: moduleController, prefer: prefer));
 }

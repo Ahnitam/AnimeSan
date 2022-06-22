@@ -1,7 +1,6 @@
 import 'package:animesan/components/dialogs/modules_dialog.dart';
 import 'package:animesan/components/logo.dart';
 import 'package:animesan/components/search_with_buttom.dart';
-import 'package:animesan/controllers/home_controller.dart';
 import 'package:animesan/controllers/module_controller.dart';
 import 'package:animesan/models/mixins.dart';
 import 'package:animesan/utils/colors.dart';
@@ -11,7 +10,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 class Home extends StatelessWidget {
-  final HomeController _homeController = Get.put(HomeController());
   final ModuleController _moduleController = Get.find<ModuleController>();
 
   Home({Key? key}) : super(key: key);
@@ -40,14 +38,14 @@ class Home extends StatelessWidget {
               onClickLeading: () => Get.dialog(
                 ModulesDialog(
                   modules: _moduleController.streamModulesEnabled,
-                  onSelect: (module) => _onSelectModule(module as StreamModule),
+                  onSelect: (module) => _moduleController.setSelectedStreamModule(module as StreamModule),
                 ),
               ),
-              buscadorIcon: _homeController.selectedStreamModule.value != null
+              buscadorIcon: _moduleController.selectedStreamModule.value != null
                   ? SvgPicture.asset(
-                      _homeController.selectedStreamModule.value!.icon,
+                      _moduleController.selectedStreamModule.value!.icon,
                       height: 30,
-                      color: _homeController.selectedStreamModule.value!.color,
+                      color: _moduleController.selectedStreamModule.value!.color,
                     )
                   : null,
             ),
@@ -87,8 +85,4 @@ class Home extends StatelessWidget {
   }
 
   void _onSubmit(String text) {}
-
-  void _onSelectModule(StreamModule module) {
-    _homeController.selectedStreamModule.value = module;
-  }
 }

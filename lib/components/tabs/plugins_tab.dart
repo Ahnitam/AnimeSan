@@ -2,7 +2,6 @@ import 'package:animesan/components/custom_buttom.dart';
 import 'package:animesan/components/dialogs/modules_dialog.dart';
 import 'package:animesan/components/module_option_config.dart';
 import 'package:animesan/controllers/module_controller.dart';
-import 'package:animesan/controllers/settings_controller.dart';
 import 'package:animesan/models/mixins.dart';
 import 'package:animesan/utils/colors.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +22,6 @@ class PluginsTabConfig extends StatefulWidget with TabConfig {
 }
 
 class _PluginsTabConfigState extends State<PluginsTabConfig> {
-  final SettingsController _settingsController = Get.find<SettingsController>();
   final ModuleController _moduleController = Get.find<ModuleController>();
 
   bool init = true;
@@ -119,7 +117,7 @@ class _PluginsTabConfigState extends State<PluginsTabConfig> {
                       }
                       setState(
                         () {
-                          _settingsController.streamPadrao == module && !state ? _settingsController.streamPadrao = null : null;
+                          _moduleController.streamPadrao == module && !state ? _moduleController.streamPadrao = null : null;
                           _moduleController.enableSwitchModule(module, state);
                         },
                       );
@@ -136,20 +134,20 @@ class _PluginsTabConfigState extends State<PluginsTabConfig> {
 
   void onSelectStreamPadrao(StreamModule streamModule) {
     setState(() {
-      _settingsController.streamPadrao = streamModule;
+      _moduleController.streamPadrao = streamModule;
     });
   }
 
   List<Widget> padraoOption(List<StreamModule> streamsModules) {
     late List<Widget> lista;
     if (streamsModules.isEmpty) {
-      _settingsController.streamPadrao = null;
+      _moduleController.streamPadrao = null;
       lista = [
         modulePadraoText(
           "Nenhum stream ativo no aplicativo",
         ),
       ];
-    } else if (_settingsController.streamPadrao == null) {
+    } else if (_moduleController.streamPadrao == null) {
       lista = [
         modulePadraoText(
           "Escolha um Stream Padrão",
@@ -160,14 +158,14 @@ class _PluginsTabConfigState extends State<PluginsTabConfig> {
         Row(
           children: [
             SvgPicture.asset(
-              _settingsController.streamPadrao!.icon,
+              _moduleController.streamPadrao!.icon,
               height: 25,
-              color: _settingsController.streamPadrao!.color,
+              color: _moduleController.streamPadrao!.color,
             ),
             const SizedBox(
               width: 10,
             ),
-            modulePadraoText(_settingsController.streamPadrao!.name),
+            modulePadraoText(_moduleController.streamPadrao!.name),
           ],
         )
       ];
