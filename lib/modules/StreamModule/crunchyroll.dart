@@ -64,6 +64,25 @@ class CrunchyrollModule extends Module with StreamModule {
 
   @override
   Future<void> logout() async {
+    try {
+      await http.post(
+        Uri(
+          scheme: "https",
+          host: apiUrl,
+          path: "/auth/v1/revoke",
+        ),
+        headers: {
+          "User-Agent": userAgent,
+          "Authorization": authorization,
+        },
+        body: {
+          "token": login.getField("refresh_token"),
+        },
+      );
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+
     return;
   }
 
