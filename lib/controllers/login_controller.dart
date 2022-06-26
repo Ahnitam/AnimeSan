@@ -16,7 +16,7 @@ class LoginController {
   }
 
   void _loadLogins() {
-    for (Module module in _moduleController.modules) {
+    for (Module module in _moduleController.getModules()) {
       String id = "${module is StreamModule ? "stream" : module is InfoModule ? "info" : throw Exception("Modulo não suportado")}_${module.id}_login";
       module.login = Login.fromId(id, _prefer);
       _refreshLogin(module);

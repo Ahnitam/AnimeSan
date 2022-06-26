@@ -1,5 +1,6 @@
 import 'package:animesan/components/dialogs/module_login_dialog.dart';
-import 'package:animesan/models/mixins.dart';
+import 'package:animesan/controllers/module_controller.dart';
+import 'package:animesan/models/module.dart';
 import 'package:animesan/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -7,14 +8,20 @@ import 'package:get/get.dart';
 import 'package:switcher/core/switcher_size.dart';
 import 'package:switcher/switcher.dart';
 
-class ModuleOptionConfig extends StatelessWidget {
-  final StreamModule module;
-  final void Function(StreamModule, bool) onChange;
+class ModuleOptionConfig<T extends Module> extends StatefulWidget {
+  final T module;
+
   const ModuleOptionConfig({
     Key? key,
     required this.module,
-    required this.onChange,
   }) : super(key: key);
+
+  @override
+  State<ModuleOptionConfig<T>> createState() => _ModuleOptionConfigState<T>();
+}
+
+class _ModuleOptionConfigState<T extends Module> extends State<ModuleOptionConfig<T>> {
+  final ModuleController _moduleController = Get.find<ModuleController>();
 
   @override
   Widget build(BuildContext context) {
@@ -22,11 +29,11 @@ class ModuleOptionConfig extends StatelessWidget {
       contentPadding: const EdgeInsets.only(left: 15, right: 0),
       leading: SvgPicture.asset(
         height: 25,
-        module.icon,
-        color: module.color,
+        widget.module.icon,
+        color: widget.module.color,
       ),
       title: Text(
-        module.name,
+        widget.module.name,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
@@ -35,7 +42,7 @@ class ModuleOptionConfig extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Switcher(
-            value: module.isEnabled,
+            value: widget.module.isEnabled,
             size: SwitcherSize.medium,
             switcherButtonRadius: 50,
             enabledSwitcherButtonRotate: true,
@@ -44,14 +51,18 @@ class ModuleOptionConfig extends StatelessWidget {
             colorOff: Colors.red.withOpacity(0.5),
             colorOn: appSecondaryColor,
             onChanged: (state) {
-              onChange(module, state);
+              if (widget.module.isEnabled == state) {
+                return;
+              }
+              _moduleController.enableSwitchModule<T>(widget.module, state);
+              setState(() {});
             },
           ),
           IconButton(
-            onPressed: module.isEnabled
+            onPressed: widget.module.isEnabled
                 ? () => Get.dialog(
                       ModuleLoginDialog(
-                        module: module,
+                        module: widget.module,
                       ),
                     )
                 : null,

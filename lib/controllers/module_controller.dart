@@ -8,9 +8,10 @@ class ModuleController {
   final List<Module> _modules = [CrunchyrollModule()];
   late final SharedPreferences _prefer;
 
-  Rx<StreamModule?> _selectedStreamModule = null.obs;
-  StreamModule? _streamPadrao;
-  InfoModule? _infoPadrao;
+  final Rx<StreamModule?> _selectedStreamModule = Rx<StreamModule?>(null);
+  final Rx<InfoModule?> _selectedInfoModule = Rx<InfoModule?>(null);
+  final Rx<StreamModule?> _streamPadrao = Rx<StreamModule?>(null);
+  final Rx<InfoModule?> _infoPadrao = Rx<InfoModule?>(null);
 
   ModuleController({required SharedPreferences prefer}) {
     _prefer = prefer;
@@ -18,72 +19,100 @@ class ModuleController {
   }
 
   void _verifyModules() {
-    // String _streamPadrao = _moduleController.getStreamModuleById(_prefer.getString("idStreamPadrao"), enabledOnly: true);
-    for (var module in modules) {
+    for (var module in _modules) {
       module.isEnabled = _prefer.getBool(
             "${module is StreamModule ? "stream" : module is InfoModule ? "info" : throw Exception("Modulo não suportado")}_${module.id}_isEnabled",
           ) ??
           false;
 
       if (module is StreamModule && module.id == _prefer.getString("idStreamPadrao") && module.isEnabled) {
-        _streamPadrao = module;
-        _selectedStreamModule = module.obs;
+        _streamPadrao.value = module;
+        _selectedStreamModule.value = module;
       } else if (module is InfoModule && module.id == _prefer.getString("idInfoPadrao") && module.isEnabled) {
-        _infoPadrao = module;
+        _infoPadrao.value = module;
+        _selectedInfoModule.value = module;
       }
     }
   }
 
-  enableSwitchModule(Module module, bool value) {
-    if (!value && _selectedStreamModule.value == module) {
-      _selectedStreamModule.value = null;
+  enableSwitchModule<T extends Module>(Module module, bool isEnabled) {
+    (T != StreamModule && T != InfoModule) ? throw Exception("Modulo não suportado") : null;
+    if (!isEnabled && getSelectedModule<T>().value == module) {
+      setSelectedModule<T>(null);
     }
-    module.isEnabled = value;
+    if (!isEnabled && getModulePadrao<T>().value == module) {
+      setModulePadrao<T>(null);
+    }
+    _streamPadrao.refresh();
+    _infoPadrao.refresh();
+    module.isEnabled = isEnabled;
     _prefer.setBool(
       "${module is StreamModule ? "stream" : module is InfoModule ? "info" : throw Exception("Modulo não suportado")}_${module.id}_isEnabled",
-      value,
+      isEnabled,
     );
   }
 
-  List<Module> get modules => _modules;
-  List<StreamModule> get streamModules => _modules.whereType<StreamModule>().toList(growable: false);
-  List<InfoModule> get infoModules => _modules.whereType<InfoModule>().toList(growable: false);
-  List<StreamModule> get streamModulesEnabled => streamModules.where((module) => module.isEnabled).toList(growable: false);
-  List<InfoModule> get infoModulesEnabled => infoModules.where((module) => module.isEnabled).toList(growable: false);
+  Rx<T?> getModulePadrao<T extends Module>() {
+    if (T == StreamModule) {
+      return _streamPadrao as Rx<T?>;
+    } else if (T == InfoModule) {
+      return _infoPadrao as Rx<T?>;
+    } else {
+      throw Exception("Modulo não suportado");
+    }
+  }
 
-  StreamModule? getStreamModuleById(String? id, {bool enabledOnly = false}) {
+  void setModulePadrao<T extends Module>(Module? module) {
+    if (module is StreamModule || (T == StreamModule && module == null)) {
+      _streamPadrao.value = module as StreamModule?;
+      if (module != null) {
+        _prefer.setString("idStreamPadrao", module.id);
+      } else {
+        _prefer.remove("idStreamPadrao");
+      }
+    } else if (module is InfoModule || (T == InfoModule && module == null)) {
+      _infoPadrao.value = module as InfoModule?;
+      if (module != null) {
+        _prefer.setString("idInfoPadrao", module.id);
+      } else {
+        _prefer.remove("idInfoPadrao");
+      }
+    } else {
+      throw Exception("Modulo não suportado");
+    }
+  }
+
+  List<T> getModules<T extends Module>({bool isEnabled = false}) {
+    return _modules.whereType<T>().where((element) => (isEnabled ? element.isEnabled : true)).toList(growable: false);
+  }
+
+  T? getModuleById<T extends Module>(String? id, {bool enabledOnly = false}) {
     try {
-      return enabledOnly ? streamModulesEnabled.firstWhere((module) => module.id == id) : streamModules.firstWhere((module) => module.id == id);
+      return enabledOnly
+          ? getModules<T>(isEnabled: true).firstWhere((module) => module.id == id)
+          : getModules<T>().firstWhere((module) => module.id == id);
     } catch (e) {
       return null;
     }
   }
 
-  Rx<StreamModule?> get selectedStreamModule => _selectedStreamModule;
-
-  void setSelectedStreamModule(StreamModule? module) {
-    _selectedStreamModule.value = module;
-  }
-
-  StreamModule? get streamPadrao => _streamPadrao;
-
-  set streamPadrao(StreamModule? value) {
-    _streamPadrao = value;
-    if (value != null) {
-      _prefer.setString("idStreamPadrao", value.id);
+  Rx<T?> getSelectedModule<T extends Module>() {
+    if (T == StreamModule) {
+      return _selectedStreamModule as Rx<T?>;
+    } else if (T == InfoModule) {
+      return _selectedInfoModule as Rx<T?>;
     } else {
-      _prefer.remove("idStreamPadrao");
+      throw Exception("Modulo não suportado");
     }
   }
 
-  InfoModule? get infoPadrao => _infoPadrao;
-
-  set infoPadrao(InfoModule? value) {
-    _infoPadrao = value;
-    if (value != null) {
-      _prefer.setString("idInfoPadrao", value.id);
+  void setSelectedModule<T extends Module>(Module? module) {
+    if (module is StreamModule || (T == StreamModule && module == null)) {
+      _selectedStreamModule.value = module as StreamModule?;
+    } else if (module is InfoModule || (T == InfoModule && module == null)) {
+      _selectedInfoModule.value = module as InfoModule?;
     } else {
-      _prefer.remove("idInfoPadrao");
+      throw Exception("Modulo não suportado");
     }
   }
 }

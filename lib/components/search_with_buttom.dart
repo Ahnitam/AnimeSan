@@ -11,7 +11,7 @@ class SearchButtom extends StatelessWidget {
   final Widget? buscadorIcon;
   final EdgeInsets margin;
   final void Function(String) onSubmit;
-  final void Function() onClickLeading;
+  final void Function()? onClickLeading;
 
   SearchButtom({
     Key? key,

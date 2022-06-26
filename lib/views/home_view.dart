@@ -1,4 +1,5 @@
 import 'package:animesan/components/dialogs/modules_dialog.dart';
+import 'package:animesan/components/item_module_dialog.dart';
 import 'package:animesan/components/logo.dart';
 import 'package:animesan/components/search_with_buttom.dart';
 import 'package:animesan/controllers/module_controller.dart';
@@ -16,6 +17,7 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Rx<StreamModule?> streamSelectedModule = _moduleController.getSelectedModule<StreamModule>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: appPrimaryColor,
@@ -35,17 +37,22 @@ class Home extends StatelessWidget {
               margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
               label: "ANIME",
               onSubmit: _onSubmit,
-              onClickLeading: () => Get.dialog(
-                ModulesDialog(
-                  modules: _moduleController.streamModulesEnabled,
-                  onSelect: (module) => _moduleController.setSelectedStreamModule(module as StreamModule),
-                ),
-              ),
-              buscadorIcon: _moduleController.selectedStreamModule.value != null
+              onClickLeading: _moduleController.getModules<StreamModule>(isEnabled: true).isNotEmpty
+                  ? () => Get.dialog(
+                        ModulesDialog<StreamModule>(
+                          items: _moduleController.getModules<StreamModule>(isEnabled: true),
+                          onSelect: (module) => _moduleController.setSelectedModule(module),
+                          itemBuilder: (module) => ItemModuleDialog(
+                            module: module,
+                          ),
+                        ),
+                      )
+                  : null,
+              buscadorIcon: streamSelectedModule.value != null
                   ? SvgPicture.asset(
-                      _moduleController.selectedStreamModule.value!.icon,
+                      streamSelectedModule.value!.icon,
                       height: 30,
-                      color: _moduleController.selectedStreamModule.value!.color,
+                      color: streamSelectedModule.value!.color,
                     )
                   : null,
             ),
