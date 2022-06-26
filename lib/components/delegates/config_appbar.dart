@@ -2,7 +2,6 @@ import 'package:animesan/components/logo.dart';
 import 'package:animesan/models/mixins.dart';
 import 'package:animesan/utils/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 class ConfigAppBarDelegate extends SliverPersistentHeaderDelegate {

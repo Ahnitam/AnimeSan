@@ -1,6 +1,6 @@
 import 'package:animesan/components/custom_buttom.dart';
-import 'package:animesan/components/dialogs/modules_dialog.dart';
-import 'package:animesan/components/item_module_dialog.dart';
+import 'package:animesan/components/dialogs/item_select_dialog.dart';
+import 'package:animesan/components/item_module.dart';
 import 'package:animesan/controllers/module_controller.dart';
 import 'package:animesan/models/module.dart';
 import 'package:animesan/utils/colors.dart';
@@ -15,7 +15,6 @@ class SelectStandardModule<T extends Module> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Rx<T?> modulePadrao = _moduleController.getModulePadrao<T>();
     return Obx(
       () {
         final List<T> modulesEnabled = _moduleController.getModules<T>(isEnabled: true);
@@ -28,10 +27,10 @@ class SelectStandardModule<T extends Module> extends StatelessWidget {
               ? null
               : () {
                   Get.dialog(
-                    ModulesDialog<T>(
+                    ItemSelectDialog<T>(
                       items: modulesEnabled,
-                      onSelect: (module) => _moduleController.setModulePadrao<T>(module),
-                      itemBuilder: (module) => ItemModuleDialog<T>(module: module),
+                      onSelect: (module, _) => _moduleController.setModulePadrao<T>(module),
+                      itemBuilder: (module) => ItemModule<T>(module: module),
                     ),
                   );
                 },

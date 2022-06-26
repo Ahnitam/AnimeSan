@@ -1,5 +1,5 @@
-import 'package:animesan/components/dialogs/modules_dialog.dart';
-import 'package:animesan/components/item_module_dialog.dart';
+import 'package:animesan/components/dialogs/item_select_dialog.dart';
+import 'package:animesan/components/item_module.dart';
 import 'package:animesan/components/logo.dart';
 import 'package:animesan/components/search_with_buttom.dart';
 import 'package:animesan/controllers/module_controller.dart';
@@ -39,10 +39,10 @@ class Home extends StatelessWidget {
               onSubmit: _onSubmit,
               onClickLeading: _moduleController.getModules<StreamModule>(isEnabled: true).isNotEmpty
                   ? () => Get.dialog(
-                        ModulesDialog<StreamModule>(
+                        ItemSelectDialog<StreamModule>(
                           items: _moduleController.getModules<StreamModule>(isEnabled: true),
-                          onSelect: (module) => _moduleController.setSelectedModule(module),
-                          itemBuilder: (module) => ItemModuleDialog(
+                          onSelect: (module, _) => _moduleController.setSelectedModule(module),
+                          itemBuilder: (module) => ItemModule(
                             module: module,
                           ),
                         ),

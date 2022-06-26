@@ -3,11 +3,11 @@ import 'package:animesan/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class ModulesDialog<T> extends StatelessWidget {
+class ItemSelectDialog<T> extends StatelessWidget {
   final List<T> items;
-  final void Function(T) onSelect;
+  final void Function(T, int) onSelect;
   final Widget Function(T) itemBuilder;
-  const ModulesDialog({Key? key, required this.items, required this.onSelect, required this.itemBuilder}) : super(key: key);
+  const ItemSelectDialog({Key? key, required this.items, required this.onSelect, required this.itemBuilder}) : super(key: key);
 
   final radius = 20.0;
   @override
@@ -40,7 +40,7 @@ class ModulesDialog<T> extends StatelessWidget {
                       borderRadius: BorderRadius.zero,
                       padding: const EdgeInsets.only(left: 10, right: 10),
                       onPressed: () {
-                        onSelect(items[index]);
+                        onSelect(items[index], index);
                         Get.back();
                       },
                       child: itemBuilder(items[index]),
@@ -51,7 +51,7 @@ class ModulesDialog<T> extends StatelessWidget {
                       height: 40,
                       child: Center(
                         child: Text(
-                          "Nenhum módulo ativo",
+                          "Nenhuma opção",
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,

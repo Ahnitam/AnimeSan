@@ -2,9 +2,9 @@ import 'package:animesan/models/module.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class ItemModuleDialog<T extends Module> extends StatelessWidget {
+class ItemModule<T extends Module> extends StatelessWidget {
   final T module;
-  const ItemModuleDialog({Key? key, required this.module}) : super(key: key);
+  const ItemModule({Key? key, required this.module}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
