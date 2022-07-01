@@ -29,7 +29,7 @@ class SelectStandardModule<T extends Module> extends StatelessWidget {
                   Get.dialog(
                     ItemSelectDialog<T>(
                       items: modulesEnabled,
-                      onSelect: (module, _) => _moduleController.setModulePadrao<T>(module),
+                      onSelect: (module) => _moduleController.setModulePadrao<T>(module),
                       itemBuilder: (module) => ItemModule<T>(module: module),
                     ),
                   );
