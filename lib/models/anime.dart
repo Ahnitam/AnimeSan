@@ -1,11 +1,11 @@
+import 'package:animesan/models/module.dart';
 import 'package:animesan/models/temporada.dart';
 
 class Anime {
   final String id;
   final String titulo;
   final String descricao;
-  final String streamId;
-  final String streamName;
+  final Module module;
   final String imageUrl;
   late final List<Temporada> temporadas;
 
@@ -13,8 +13,7 @@ class Anime {
     required this.id,
     required this.titulo,
     required this.descricao,
-    required this.streamId,
-    required this.streamName,
+    required this.module,
     required this.imageUrl,
     List<Temporada>? temporadas,
   }) {
@@ -27,6 +26,7 @@ class Anime {
     String? descricao,
     String? streamId,
     String? imageUrl,
+    Module? module,
     List<Temporada>? temporadas,
     String? streamName,
   }) {
@@ -34,8 +34,7 @@ class Anime {
       id: id ?? this.id,
       titulo: titulo ?? this.titulo,
       descricao: descricao ?? this.descricao,
-      streamId: streamId ?? this.streamId,
-      streamName: streamName ?? this.streamName,
+      module: module ?? this.module,
       imageUrl: imageUrl ?? this.imageUrl,
       temporadas: temporadas ?? this.temporadas,
     );
