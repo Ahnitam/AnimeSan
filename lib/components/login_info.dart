@@ -5,10 +5,10 @@ import 'package:animesan/models/module.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class LoginInfoDialog extends StatelessWidget {
+class LoginInfo extends StatelessWidget {
   final Module module;
   final LoginController _loginController = Get.find<LoginController>();
-  LoginInfoDialog({Key? key, required this.module}) : super(key: key);
+  LoginInfo({Key? key, required this.module}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

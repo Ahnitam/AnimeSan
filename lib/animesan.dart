@@ -1,4 +1,4 @@
-import 'package:animesan/views/config.dart';
+import 'package:animesan/views/config_view.dart';
 import 'package:animesan/views/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
