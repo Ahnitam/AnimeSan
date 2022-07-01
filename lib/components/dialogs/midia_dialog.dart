@@ -1,6 +1,8 @@
 import 'dart:ui';
 
+import 'package:animesan/components/cards/episodio_card.dart';
 import 'package:animesan/components/custom_buttom.dart';
+import 'package:animesan/components/delegates/choose_temporada.dart';
 import 'package:animesan/components/dialogs/item_select_dialog.dart';
 import 'package:animesan/components/logo.dart';
 import 'package:animesan/controllers/midia_controller.dart';
@@ -40,110 +42,27 @@ class MidiaDialog extends StatelessWidget {
               return SizedBox(
                 height: double.infinity,
                 width: double.infinity,
-                child: Stack(
-                  children: [
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 10, right: 10, left: 10),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: SizedBox(
-                            height: 50,
-                            width: double.infinity,
-                            child: Stack(
-                              fit: StackFit.loose,
-                              children: [
-                                ClipRect(
-                                  child: BackdropFilter(
-                                    filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                                    child: Container(
-                                      decoration: BoxDecoration(color: appGreyColor.withOpacity(0.4)),
-                                    ),
-                                  ),
-                                ),
-                                Obx(
-                                  () {
-                                    return Row(
-                                      children: [
-                                        CustomButtom(
-                                          padding: const EdgeInsets.only(left: 10),
-                                          height: double.infinity,
-                                          borderRadius: BorderRadius.zero,
-                                          width: 60,
-                                          color: Colors.transparent,
-                                          onPressed: anime.temporadas.indexOf(_selectedTemporada.value!) != 0 ? previusTemporada : null,
-                                          child: Icon(
-                                            Icons.arrow_back_ios,
-                                            color: anime.temporadas.indexOf(_selectedTemporada.value!) != 0 ? Colors.white : appGreyColor,
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: CustomButtom(
-                                            padding: const EdgeInsets.symmetric(horizontal: 5),
-                                            borderRadius: BorderRadius.zero,
-                                            color: Colors.transparent,
-                                            height: double.infinity,
-                                            onPressed: anime.temporadas.length > 1
-                                                ? () => Get.dialog(
-                                                      ItemSelectDialog<Temporada>(
-                                                        items: anime.temporadas,
-                                                        onSelect: (temporada) => _selectedTemporada.value = temporada,
-                                                        itemBuilder: (temporada) => Text(
-                                                          temporada.titulo,
-                                                          textAlign: TextAlign.center,
-                                                          maxLines: 2,
-                                                          overflow: TextOverflow.ellipsis,
-                                                          style: const TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 14,
-                                                            fontFamily: "Bree Serif",
-                                                            fontWeight: FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    )
-                                                : null,
-                                            child: Text(
-                                              _selectedTemporada.value!.titulo,
-                                              style: const TextStyle(
-                                                fontFamily: "Bree Serif",
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ),
-                                        ),
-                                        CustomButtom(
-                                          height: double.infinity,
-                                          borderRadius: BorderRadius.zero,
-                                          width: 60,
-                                          color: Colors.transparent,
-                                          onPressed: anime.temporadas.indexOf(_selectedTemporada.value!) != anime.temporadas.length - 1
-                                              ? nextTemporada
-                                              : null,
-                                          child: Center(
-                                            child: Icon(
-                                              Icons.arrow_forward_ios,
-                                              color: anime.temporadas.indexOf(_selectedTemporada.value!) != anime.temporadas.length - 1
-                                                  ? Colors.white
-                                                  : appGreyColor,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+                child: CustomScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  slivers: [
+                    SliverPersistentHeader(
+                      delegate: ChooseTemporada(anime: anime, selectedTemporada: _selectedTemporada),
+                      floating: true,
                     ),
+                    Obx(() {
+                      return SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (_, index) {
+                            return EpisodioCard(
+                              episodio: _selectedTemporada.value!.episodios[index],
+                              height: 150,
+                              margin: EdgeInsets.only(top: 10, left: 10, right: 10),
+                            );
+                          },
+                          childCount: _selectedTemporada.value!.episodios.length,
+                        ),
+                      );
+                    }),
                   ],
                 ),
               );
@@ -160,13 +79,5 @@ class MidiaDialog extends StatelessWidget {
         },
       ),
     );
-  }
-
-  void previusTemporada() {
-    _selectedTemporada.value = anime.temporadas[anime.temporadas.indexOf(_selectedTemporada.value!) - 1];
-  }
-
-  void nextTemporada() {
-    _selectedTemporada.value = anime.temporadas[anime.temporadas.indexOf(_selectedTemporada.value!) + 1];
   }
 }

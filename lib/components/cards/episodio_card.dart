@@ -47,6 +47,8 @@ class _EpisodioCardState extends State<EpisodioCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      margin: EdgeInsets.zero,
+      elevation: 1,
       color: Colors.transparent,
       child: Padding(
         padding: widget.margin,
