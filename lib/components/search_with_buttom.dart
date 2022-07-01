@@ -1,4 +1,5 @@
 import 'package:animesan/components/custom_buttom.dart';
+import 'package:animesan/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 class SearchButtom extends StatelessWidget {
@@ -6,7 +7,7 @@ class SearchButtom extends StatelessWidget {
   final String label;
   final double height;
   final double radius;
-  final Color color;
+  final Color backgroudColor;
   final Color searchButtomColor;
   final Widget? buscadorIcon;
   final EdgeInsets margin;
@@ -20,8 +21,8 @@ class SearchButtom extends StatelessWidget {
     required this.onClickLeading,
     this.radius = 25,
     this.height = 50,
-    this.color = const Color.fromARGB(255, 33, 33, 33),
-    this.searchButtomColor = const Color.fromARGB(169, 27, 94, 31),
+    this.backgroudColor = appGreyColor,
+    this.searchButtomColor = appPrimaryColor,
     this.margin = const EdgeInsets.all(0),
     this.buscadorIcon,
   }) : super(key: key);
@@ -34,7 +35,7 @@ class SearchButtom extends StatelessWidget {
         borderRadius: BorderRadius.circular(radius),
         child: Container(
           height: height,
-          color: color,
+          color: backgroudColor,
           child: Row(
             children: [
               CustomButtom(
@@ -50,13 +51,16 @@ class SearchButtom extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.only(top: 10, bottom: 10),
                   child: TextField(
-                    onEditingComplete: () => onSubmit(textBuscarController.text),
+                    onEditingComplete: () {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      onSubmit(textBuscarController.text);
+                    },
                     keyboardType: TextInputType.text,
                     controller: textBuscarController,
                     textAlignVertical: TextAlignVertical.bottom,
                     style: const TextStyle(
                       fontFamily: "Bree Serif",
-                      color: Colors.white,
+                      color: appWhiteColor,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -66,19 +70,19 @@ class SearchButtom extends StatelessWidget {
                       labelText: label,
                       labelStyle: const TextStyle(
                         fontFamily: "Bree Serif",
-                        color: Colors.white,
+                        color: appWhiteColor,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
                       enabledBorder: const OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: Color.fromARGB(0, 0, 0, 0),
+                          color: Colors.transparent,
                           width: 0,
                         ),
                       ),
                       focusedBorder: const OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: Color.fromARGB(0, 0, 0, 0),
+                          color: Colors.transparent,
                           width: 0,
                         ),
                       ),
@@ -91,10 +95,13 @@ class SearchButtom extends StatelessWidget {
                 height: double.infinity,
                 width: 70,
                 color: searchButtomColor,
-                onPressed: () => onSubmit(textBuscarController.text),
+                onPressed: () {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  onSubmit(textBuscarController.text);
+                },
                 child: const Icon(
                   Icons.search_rounded,
-                  color: Colors.black,
+                  color: appBlackColor,
                 ),
               )
             ],

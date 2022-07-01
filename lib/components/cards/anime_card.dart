@@ -29,6 +29,7 @@ class AnimeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      margin: EdgeInsets.zero,
       elevation: 1,
       color: Colors.transparent,
       child: Padding(
