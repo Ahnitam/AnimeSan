@@ -5,9 +5,10 @@ enum LoginState {
   error,
 }
 
-enum EpisodeState {
+enum SearchState {
   inicial,
   carregando,
+  vazio,
   sucesso,
   error,
 }
