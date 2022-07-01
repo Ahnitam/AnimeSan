@@ -5,12 +5,14 @@ class Field {
   dynamic value;
   bool isVisible;
   TextInputType inputType;
+  final List<String> autoFills;
 
   Field({
     required this.name,
     this.value = "",
     this.isVisible = false,
     this.inputType = TextInputType.text,
+    this.autoFills = const [],
   });
 
   factory Field.fromJson(Map<String, dynamic> json) {

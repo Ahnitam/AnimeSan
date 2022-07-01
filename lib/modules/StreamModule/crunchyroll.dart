@@ -17,24 +17,28 @@ import 'package:http/http.dart' as http;
 
 class CrunchyrollModule extends Module with StreamModule {
   CrunchyrollModule()
-      : super(loginForms: [
-          LoginForm(
-            id: "username_password",
-            name: "Email/Password",
-            fields: {
-              "username_email": Field(
-                name: "Username/Email",
-                inputType: TextInputType.emailAddress,
-                isVisible: true,
-              ),
-              "password": Field(
-                name: "Senha",
-                inputType: TextInputType.text,
-                isVisible: false,
-              ),
-            },
-          ),
-        ]);
+      : super(
+          loginForms: [
+            LoginForm(
+              id: "username_password",
+              name: "Email/Password",
+              fields: {
+                "username_email": Field(
+                  name: "Username/Email",
+                  inputType: TextInputType.emailAddress,
+                  isVisible: true,
+                  autoFills: [AutofillHints.email, AutofillHints.username],
+                ),
+                "password": Field(
+                  name: "Senha",
+                  inputType: TextInputType.text,
+                  isVisible: false,
+                  autoFills: [AutofillHints.password],
+                ),
+              },
+            ),
+          ],
+        );
 
   final String userAgent = "Crunchyroll";
   final String authorization = "Basic bzl5aDQ2empyZjc2Z2xjY25wMWw6SnFtZWZoX1Vzc2RBMHV4YVJjTlJtSlBBS255SnRwaTQ=";
@@ -219,7 +223,7 @@ class CrunchyrollModule extends Module with StreamModule {
     await _plano();
   }
 
-  Future<Map<String, String>> _cms() async {
+  Future<Map<String, dynamic>> _cms() async {
     await _token();
     final response = await http.get(
       Uri(
@@ -262,8 +266,7 @@ class CrunchyrollModule extends Module with StreamModule {
           for (var anime in item["items"]) {
             animes.add(
               Anime(
-                streamId: id,
-                streamName: name,
+                module: this,
                 id: anime['id'],
                 titulo: anime['title'],
                 descricao: anime['description'],
@@ -273,14 +276,14 @@ class CrunchyrollModule extends Module with StreamModule {
           }
         }
       }
-      return animes;
+      return animes.toList(growable: false);
     }
     throw Exception("Error na Busca");
   }
 
   @override
   Future<Anime> fetchAnimeInfo(Anime anime) async {
-    final Map<String, String> cms = await _cms();
+    final Map<String, dynamic> cms = await _cms();
     final response = await http.get(
       Uri(
         scheme: "https",
@@ -324,7 +327,7 @@ class CrunchyrollModule extends Module with StreamModule {
     throw Exception("Erro ao buscar temporadas");
   }
 
-  Future<void> _getEpisodios(Temporada temporada, Map<String, String> cms) async {
+  Future<void> _getEpisodios(Temporada temporada, Map<String, dynamic> cms) async {
     final response = await http.get(
       Uri(
         scheme: "https",

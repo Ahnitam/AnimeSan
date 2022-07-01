@@ -1,6 +1,6 @@
 import 'package:animesan/components/custom_buttom.dart';
 import 'package:animesan/components/dialogs/item_select_dialog.dart';
-import 'package:animesan/components/dialogs/login_info_dialog.dart';
+import 'package:animesan/components/login_info.dart';
 import 'package:animesan/components/logo.dart';
 import 'package:animesan/controllers/login_controller.dart';
 import 'package:animesan/models/login/field.dart';
@@ -14,9 +14,9 @@ import 'package:get/get.dart';
 class ModuleLoginDialog extends StatelessWidget {
   final Module module;
   final double radius = 20.0;
-  final Rx<int?> _selectedIndex = Rx<int?>(null);
+  final Rx<LoginForm?> _selectedLoginForm = Rx<LoginForm?>(null);
   ModuleLoginDialog({Key? key, required this.module}) : super(key: key) {
-    _selectedIndex.value = module.loginForms.isNotEmpty ? 0 : null;
+    _selectedLoginForm.value = module.loginForms.isNotEmpty ? module.loginForms[0] : null;
   }
 
   final LoginController _loginController = Get.find<LoginController>();
@@ -39,9 +39,9 @@ class ModuleLoginDialog extends StatelessWidget {
           ),
           child: Obx(
             () {
-              if (_selectedIndex.value != null) {
+              if (_selectedLoginForm.value != null) {
                 if (module.login.state.value == LoginState.logado) {
-                  return LoginInfoDialog(module: module);
+                  return LoginInfo(module: module);
                 } else if (module.login.state.value == LoginState.carregando) {
                   return const SizedBox(
                     height: 200,
@@ -90,6 +90,7 @@ class ModuleLoginDialog extends StatelessWidget {
             keyboardType: TextInputType.text,
             obscureText: !field.isVisible,
             controller: textController,
+            autofillHints: field.autoFills,
             textAlignVertical: TextAlignVertical.bottom,
             style: const TextStyle(
               fontFamily: "Bree Serif",
@@ -130,8 +131,7 @@ class ModuleLoginDialog extends StatelessWidget {
     final List<Widget> widgets = List.empty(growable: true);
     final List<TextEditingController> controllers = List.empty(growable: true);
 
-    final LoginForm loginForm = module.loginForms[_selectedIndex.value!];
-    for (var field in loginForm.fields.values) {
+    for (var field in _selectedLoginForm.value!.fields.values) {
       final TextEditingController textController = TextEditingController();
       controllers.add(textController);
       widgets.add(textField(field, textController));
@@ -151,7 +151,7 @@ class ModuleLoginDialog extends StatelessWidget {
             onPressed: () => Get.dialog(
               ItemSelectDialog<LoginForm>(
                 items: module.loginForms,
-                onSelect: (_, index) => _selectedIndex.value = index,
+                onSelect: (loginForm) => _selectedLoginForm.value = loginForm,
                 itemBuilder: (item) => Text(
                   item.name,
                   style: const TextStyle(
@@ -169,7 +169,7 @@ class ModuleLoginDialog extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    loginForm.name,
+                    _selectedLoginForm.value!.name,
                     style: const TextStyle(
                       fontFamily: "Bree Serif",
                       fontSize: 12,
@@ -203,10 +203,10 @@ class ModuleLoginDialog extends StatelessWidget {
             height: 40,
             width: 150,
             onPressed: () {
-              for (int i = 0; i < loginForm.fields.length; i++) {
-                loginForm.fields[loginForm.fields.keys.elementAt(i)]!.value = controllers[i].text;
+              for (int i = 0; i < _selectedLoginForm.value!.fields.length; i++) {
+                _selectedLoginForm.value!.fields[_selectedLoginForm.value!.fields.keys.elementAt(i)]!.value = controllers[i].text;
               }
-              _loginController.logar(module, loginForm.id);
+              _loginController.logar(module, _selectedLoginForm.value!.id);
             },
             child: const Text(
               "Login",
