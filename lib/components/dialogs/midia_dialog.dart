@@ -82,7 +82,7 @@ class MidiaDialog extends StatelessWidget {
                             return EpisodioCard(
                               episodio: _selectedTemporada.value!.episodios[index],
                               height: 150,
-                              margin: EdgeInsets.only(top: 10, left: 10, right: 10),
+                              margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
                             );
                           },
                           childCount: _selectedTemporada.value!.episodios.length,

@@ -58,7 +58,7 @@ class HomeController {
         animationDuration: const Duration(milliseconds: 500),
         duration: const Duration(seconds: 2),
       );
-    } on Exception {
+    } catch (e) {
       _searchState.value = SearchState.error;
       _animes.value = List.empty();
       Get.snackbar(
