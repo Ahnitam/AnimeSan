@@ -7,7 +7,8 @@ class ItemSelectDialog<T> extends StatelessWidget {
   final List<T> items;
   final void Function(T) onSelect;
   final Widget Function(T) itemBuilder;
-  const ItemSelectDialog({Key? key, required this.items, required this.onSelect, required this.itemBuilder}) : super(key: key);
+  final T? selectedItem;
+  const ItemSelectDialog({Key? key, required this.items, required this.onSelect, required this.itemBuilder, this.selectedItem}) : super(key: key);
 
   final radius = 20.0;
   @override
@@ -36,7 +37,7 @@ class ItemSelectDialog<T> extends StatelessWidget {
                   ? List.generate(
                       items.length,
                       (index) => CustomButtom(
-                        color: appGreyColor,
+                        color: selectedItem == items[index] ? appSecondaryColor : appGreyColor,
                         height: 40,
                         width: double.infinity,
                         borderRadius: BorderRadius.zero,

@@ -16,7 +16,7 @@ class ChooseTemporada extends SliverPersistentHeaderDelegate {
   late final Rx<Temporada?> selectedTemporada;
 
   ChooseTemporada({
-    this.expandedHeight = 65,
+    this.expandedHeight = 75,
     required this.anime,
     required this.selectedTemporada,
   });
@@ -24,7 +24,7 @@ class ChooseTemporada extends SliverPersistentHeaderDelegate {
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
+      padding: const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: SizedBox(
@@ -66,6 +66,7 @@ class ChooseTemporada extends SliverPersistentHeaderDelegate {
                           onPressed: anime.temporadas.length > 1
                               ? () => Get.dialog(
                                     ItemSelectDialog<Temporada>(
+                                      selectedItem: selectedTemporada.value,
                                       items: anime.temporadas,
                                       onSelect: (temporada) => selectedTemporada.value = temporada,
                                       itemBuilder: (temporada) => Text(
