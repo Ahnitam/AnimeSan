@@ -1,3 +1,4 @@
+import 'package:animesan/utils/colors.dart';
 import 'package:animesan/views/config_view.dart';
 import 'package:animesan/views/home_view.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,10 @@ class AnimeSan extends StatelessWidget {
         brightness: Brightness.dark,
         primarySwatch: Colors.green,
         scaffoldBackgroundColor: Colors.black,
+        appBarTheme: const AppBarTheme(
+          centerTitle: true,
+          color: appPrimaryColor,
+        ),
       ),
       themeMode: ThemeMode.dark,
       initialRoute: "/",
