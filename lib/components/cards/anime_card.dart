@@ -30,7 +30,7 @@ class AnimeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.zero,
-      elevation: 1,
+      elevation: 0,
       color: Colors.transparent,
       child: Padding(
         padding: margin,
