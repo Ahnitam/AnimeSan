@@ -270,7 +270,7 @@ class CrunchyrollModule extends Module with StreamModule {
                 id: anime['id'],
                 titulo: anime['title'],
                 descricao: anime['description'],
-                imageUrl: anime["images"]["poster_tall"][0][1]["source"] ?? "",
+                imageUrl: (anime["images"]["poster_tall"][0] as List<dynamic>).last["source"] ?? "",
               ),
             );
           }
