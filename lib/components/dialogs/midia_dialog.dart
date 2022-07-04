@@ -1,9 +1,5 @@
-import 'dart:ui';
-
 import 'package:animesan/components/cards/episodio_card.dart';
-import 'package:animesan/components/custom_buttom.dart';
 import 'package:animesan/components/delegates/choose_temporada.dart';
-import 'package:animesan/components/dialogs/item_select_dialog.dart';
 import 'package:animesan/components/logo.dart';
 import 'package:animesan/controllers/midia_controller.dart';
 import 'package:animesan/models/anime.dart';
@@ -39,12 +35,42 @@ class MidiaDialog extends StatelessWidget {
               );
             } else {
               _selectedTemporada.value = anime.temporadas.first;
-              return SizedBox(
+              return Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: NetworkImage(anime.imageUrl),
+                    onError: (_, __) {
+                      debugPrint("Erro ao carregar imagem");
+                    },
+                    fit: BoxFit.cover,
+                    opacity: 0.3,
+                    colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.5), BlendMode.darken),
+                  ),
+                ),
                 height: double.infinity,
                 width: double.infinity,
                 child: CustomScrollView(
                   physics: const BouncingScrollPhysics(),
                   slivers: [
+                    SliverAppBar(
+                      backgroundColor: Colors.transparent,
+                      title: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        child: Text(
+                          anime.titulo,
+                          style: const TextStyle(
+                            fontFamily: "Bree Serif",
+                            fontSize: 14,
+                            color: appWhiteColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      centerTitle: true,
+                      pinned: false,
+                      floating: false,
+                    ),
                     SliverPersistentHeader(
                       delegate: ChooseTemporada(anime: anime, selectedTemporada: _selectedTemporada),
                       floating: true,
