@@ -12,3 +12,10 @@ enum SearchState {
   sucesso,
   error,
 }
+
+enum AnimeState {
+  inicial,
+  carregando,
+  carregado,
+  error,
+}

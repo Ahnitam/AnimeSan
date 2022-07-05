@@ -5,6 +5,7 @@ import 'package:animesan/controllers/midia_controller.dart';
 import 'package:animesan/models/anime.dart';
 import 'package:animesan/models/temporada.dart';
 import 'package:animesan/utils/colors.dart';
+import 'package:animesan/utils/states.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -21,14 +22,13 @@ class MidiaDialog extends StatelessWidget {
     return Dialog(
       insetPadding: EdgeInsets.zero,
       backgroundColor: appBackgroudColor,
-      child: FutureBuilder(
-        future: _midiaController.fetchAnime(anime),
-        builder: (_, AsyncSnapshot<Anime> animeSnapshot) {
-          if (animeSnapshot.hasError) {
+      child: Obx(
+        () {
+          if (anime.state.value == AnimeState.error) {
             return const Center(
               child: Text("Error"),
             );
-          } else if (animeSnapshot.hasData) {
+          } else if (anime.state.value == AnimeState.carregado) {
             if (anime.temporadas.isEmpty) {
               return const Center(
                 child: Text("Sem Temporadas"),
@@ -94,6 +94,9 @@ class MidiaDialog extends StatelessWidget {
               );
             }
           } else {
+            if (anime.state.value == AnimeState.inicial) {
+              _midiaController.fetchAnime(anime);
+            }
             return const Center(
               child: AnimeSanLogo(
                 height: 60,

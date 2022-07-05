@@ -1,5 +1,7 @@
 import 'package:animesan/models/module.dart';
 import 'package:animesan/models/temporada.dart';
+import 'package:animesan/utils/states.dart';
+import 'package:get/get.dart';
 
 class Anime {
   final String id;
@@ -7,7 +9,8 @@ class Anime {
   final String descricao;
   final Module module;
   final String imageUrl;
-  late final List<Temporada> temporadas;
+  final List<Temporada> temporadas;
+  final Rx<AnimeState> state = Rx<AnimeState>(AnimeState.inicial);
 
   Anime({
     required this.id,
@@ -16,9 +19,7 @@ class Anime {
     required this.module,
     required this.imageUrl,
     List<Temporada>? temporadas,
-  }) {
-    this.temporadas = temporadas ?? List.empty(growable: true);
-  }
+  }) : temporadas = temporadas ?? List.empty(growable: true);
 
   Anime copyWith({
     String? id,

@@ -1,12 +1,18 @@
 import 'package:animesan/models/anime.dart';
+import 'package:animesan/utils/states.dart';
 
 class MidiaController {
   MidiaController();
 
-  Future<Anime> fetchAnime(Anime anime) async {
-    if (anime.temporadas.isEmpty) {
-      await anime.module.fetchAnimeInfo(anime);
+  Future<void> fetchAnime(Anime anime) async {
+    try {
+      if (anime.temporadas.isEmpty) {
+        anime.state.value = AnimeState.carregando;
+        await anime.module.fetchAnimeInfo(anime);
+      }
+      anime.state.value = AnimeState.carregado;
+    } catch (e) {
+      anime.state.value = AnimeState.error;
     }
-    return anime;
   }
 }
