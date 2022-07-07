@@ -7,7 +7,7 @@ class Temporada {
   final String titulo;
   final String numero;
   final MediaType tipo;
-  late final List<Episodio> episodios;
+  final List<Episodio> episodios;
 
   final Anime anime;
 
@@ -18,7 +18,5 @@ class Temporada {
     required this.numero,
     required this.tipo,
     List<Episodio>? episodios,
-  }) {
-    this.episodios = episodios ?? List.empty(growable: true);
-  }
+  }) : episodios = episodios ?? List.empty(growable: true);
 }

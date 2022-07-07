@@ -10,16 +10,17 @@ class Anime {
   final Module module;
   final String imageUrl;
   final List<Temporada> temporadas;
-  final Rx<AnimeState> state = Rx<AnimeState>(AnimeState.inicial);
+  final Rx<MidiaState> state = Rx<MidiaState>(MidiaState.inicial);
 
   Anime({
     required this.id,
     required this.titulo,
     required this.descricao,
     required this.module,
-    required this.imageUrl,
+    required String? imageUrl,
     List<Temporada>? temporadas,
-  }) : temporadas = temporadas ?? List.empty(growable: true);
+  })  : temporadas = temporadas ?? List.empty(growable: true),
+        imageUrl = imageUrl ?? "";
 
   Anime copyWith({
     String? id,
