@@ -24,11 +24,11 @@ class MidiaDialog extends StatelessWidget {
       backgroundColor: appBackgroudColor,
       child: Obx(
         () {
-          if (anime.state.value == AnimeState.error) {
+          if (anime.state.value == MidiaState.error) {
             return const Center(
               child: Text("Error"),
             );
-          } else if (anime.state.value == AnimeState.carregado) {
+          } else if (anime.state.value == MidiaState.carregado) {
             if (anime.temporadas.isEmpty) {
               return const Center(
                 child: Text("Sem Temporadas"),
@@ -80,6 +80,7 @@ class MidiaDialog extends StatelessWidget {
                         delegate: SliverChildBuilderDelegate(
                           (_, index) {
                             return EpisodioCard(
+                              midiaController: _midiaController,
                               episodio: _selectedTemporada.value!.episodios[index],
                               height: 150,
                               margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
@@ -94,7 +95,7 @@ class MidiaDialog extends StatelessWidget {
               );
             }
           } else {
-            if (anime.state.value == AnimeState.inicial) {
+            if (anime.state.value == MidiaState.inicial) {
               _midiaController.fetchAnime(anime);
             }
             return const Center(

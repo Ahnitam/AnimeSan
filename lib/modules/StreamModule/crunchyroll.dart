@@ -270,7 +270,7 @@ class CrunchyrollModule extends Module with StreamModule {
                 id: anime['id'],
                 titulo: anime['title'],
                 descricao: anime['description'],
-                imageUrl: (anime["images"]["poster_tall"][0] as List<dynamic>).last["source"] ?? "",
+                imageUrl: _getImageUrl(anime["images"]),
               ),
             );
           }
@@ -279,6 +279,22 @@ class CrunchyrollModule extends Module with StreamModule {
       return animes.toList(growable: false);
     }
     throw Exception("Error na Busca");
+  }
+
+  String? _getImageUrl(Map<String, dynamic> images, {ImageType imageType = ImageType.poster}) {
+    try {
+      if (imageType == ImageType.poster) {
+        final Map<String, dynamic> poster = (images["poster_tall"][0] as List<dynamic>).last;
+        return poster["source"];
+      } else if (imageType == ImageType.thumb) {
+        final Map<String, dynamic> poster = (images["thumbnail"][0] as List<dynamic>).first;
+        return poster["source"];
+      } else {
+        throw Exception("ImageType not supported");
+      }
+    } catch (e) {
+      return null;
+    }
   }
 
   @override
@@ -354,18 +370,18 @@ class CrunchyrollModule extends Module with StreamModule {
           descricao: item["description"],
           mediasId: item["is_dubbed"]
               ? {
-                  MediaType.dub: (!item["is_premium_only"] || (login.state.value == LoginState.logado && login.getField("plano") == "Premium"))
+                  EpisodeType.dub: (!item["is_premium_only"] || (login.state.value == LoginState.logado && login.getField("plano") == "Premium"))
                       ? item["__links__"]["streams"]["href"]
                       : "",
                 }
               : {
-                  MediaType.leg: (!item["is_premium_only"] || (login.state.value == LoginState.logado && login.getField("plano") == "Premium"))
+                  EpisodeType.leg: (!item["is_premium_only"] || (login.state.value == LoginState.logado && login.getField("plano") == "Premium"))
                       ? item["__links__"]["streams"]["href"]
                       : "",
                 },
           isPremium: item["is_premium_only"],
           duracao: Duration(milliseconds: item["duration_ms"]),
-          imageUrl: (item["images"]["thumbnail"] != null) ? item["images"]["thumbnail"][0][0]["source"] : "",
+          imageUrl: _getImageUrl(item["images"], imageType: ImageType.thumb),
           numero: formatterNum(item["episode_number"]?.toString()) ?? "00",
           temporada: temporada,
         );
@@ -376,7 +392,7 @@ class CrunchyrollModule extends Module with StreamModule {
     throw Exception("Erro ao buscar episodios");
   }
 
-  Future<Map<String, dynamic>> _getStreamVideo(String streamLink) async {
+  Future<Map<String, dynamic>> _getStreamVideo(String streamLink, {required IdiomaType idiomaType}) async {
     final signed = await _cms();
     final response = await http.get(
       Uri(
@@ -384,7 +400,7 @@ class CrunchyrollModule extends Module with StreamModule {
         host: apiUrl,
         path: streamLink,
         queryParameters: {
-          "locale": "pt-BR",
+          "locale": _getIdiomaString(idiomaType),
           "Signature": signed["signature"],
           "Policy": signed["policy"],
           "Key-Pair-Id": signed["key_pair_id"],
@@ -405,105 +421,93 @@ class CrunchyrollModule extends Module with StreamModule {
     return "https://fy.v.vrv.co/evs/${assets.group(1)}/assets/${assets.group(2)}";
   }
 
-  Future<void> _addDownload({
-    required String streamLink,
-    required Download download,
-    required bool isDual,
-  }) async {
-    final resultado = await _getStreamVideo(streamLink);
-    final streams = await getStreams(resultado["streams"]["adaptive_hls"][""]["url"], headers: null);
-    bool isDub = false;
-    if (streams != null) {
-      if (resultado["audio_locale"].toString().toUpperCase() == "JA-JP") {
-        download.streams["video"]!["leg"] = {
-          "url": _toStaticLink(await getAdaptUrl(streams["VIDEO"]!, min: false)),
-        };
-      } else if (resultado["audio_locale"].toString().toUpperCase() == "PT-BR") {
-        isDub = true;
-        download.streams["video"]!["dub"] = {
-          "url": _toStaticLink(await getAdaptUrl(streams["VIDEO"]!, min: false)),
-        };
-      }
-      if (streams["AUDIO"] != null) {
-        if (resultado["audio_locale"].toString().toUpperCase() == "JA-JP") {
-          download.streams["audio"]!["leg"] = {
-            "url": streams["AUDIO"]![0]["url"],
-          };
-        } else if (resultado["audio_locale"].toString().toUpperCase() == "PT-BR") {
-          if (isDual) {
-            (download.streams["video"] as Map).remove("dub");
-          }
-          isDub = true;
-          download.streams["audio"]!["dub"] = {
-            "url": streams["AUDIO"]![0]["url"],
-          };
-        }
-      }
-    } else {
-      if (resultado["audio_locale"].toString().toUpperCase() == "JA-JP") {
-        download.streams["video"]!["leg"] = {
-          "url": resultado["streams"]["adaptive_hls"][""]["url"],
-        };
-      } else if (resultado["audio_locale"].toString().toUpperCase() == "PT-BR") {
-        isDub = true;
-        download.streams["video"]!["dub"] = {
-          "url": resultado["streams"]["adaptive_hls"][""]["url"],
-        };
-      }
-    }
-
-    if (isDub) {
-      try {
-        download.streams["legenda"]!["dub"] = {
-          "url": _toStaticLink(resultado["subtitles"]["pt-BR"]["url"]),
-          "tipo": resultado["subtitles"]["pt-BR"]["format"].toString().toLowerCase(),
-        };
-        // ignore: empty_catches
-      } catch (e) {}
-    } else {
-      download.streams["legenda"]!["leg"] = {
-        "url": _toStaticLink(resultado["subtitles"]["pt-BR"]["url"]),
-        "tipo": resultado["subtitles"]["pt-BR"]["format"].toString().toLowerCase(),
-      };
+  String _getIdiomaString(IdiomaType? idioma) {
+    switch (idioma) {
+      case IdiomaType.ptBR:
+        return "pt-BR";
+      case IdiomaType.enUS:
+        return "en-US";
+      case IdiomaType.jaJP:
+        return "ja-JP";
+      default:
+        return "";
     }
   }
 
   @override
-  Future<Episodio> fetchDownloadInfo(Episodio episodio) async {
+  Future<Download> fetchDownloadInfo({
+    required Episodio episodio,
+    MediaType? mediaType,
+    IdiomaType idiomaType = IdiomaType.ptBR,
+    QualidadeDownload qualidade = QualidadeDownload.melhor,
+  }) async {
     Download download = Download(
       episodeId: episodio.id,
       seasonId: episodio.temporada.id,
       duration: episodio.duracao,
       animeName: episodio.temporada.anime.titulo,
-      seasonEpisode: "S$episodio.temporada.numeroE$episodio.numero}",
+      seasonEpisode: "S${episodio.temporada.numero}E${episodio.numero}",
       stream: name,
-      streams: {
-        "video": {},
-        "audio": {},
-        "legenda": {},
-      },
-      tipo: (episodio.mediasId[MediaType.dub] != null && episodio.mediasId[MediaType.leg] != null)
-          ? MediaType.dual
-          : (episodio.mediasId[MediaType.dub] != null)
-              ? MediaType.dub
-              : MediaType.leg,
+      tipo: mediaType ??
+          ((episodio.mediasId[EpisodeType.dub] != null && episodio.mediasId[EpisodeType.leg] != null)
+              ? MediaType.dual
+              : (episodio.mediasId[EpisodeType.dub] != null)
+                  ? MediaType.dub
+                  : MediaType.leg),
     );
-
     try {
-      await _addDownload(
-        streamLink: episodio.mediasId[MediaType.leg]!,
-        download: download,
-        isDual: (episodio.mediasId[MediaType.dub] != null) ? true : false,
-      );
-      if (episodio.mediasId[MediaType.dub] != null) {
-        await _addDownload(
-          streamLink: episodio.mediasId[MediaType.dub]!,
-          download: download,
-          isDual: true,
-        );
+      for (var episodeType in episodio.mediasId.keys) {
+        final result = await _getStreamVideo(episodio.mediasId[episodeType]!, idiomaType: idiomaType);
+
+        Map<DownloadType, Future<Map<String, List<Map<String, dynamic>>?>?>> downloadStreams = {
+          DownloadType.hardsub: getStreams(result["streams"]["vo_adaptive_hls"][_getIdiomaString(idiomaType)]["url"], headers: null),
+          DownloadType.softsub: getStreams(result["streams"]["vo_adaptive_hls"][_getIdiomaString(null)]["url"], headers: null),
+        };
+
+        for (var downloadType in downloadStreams.keys) {
+          final Map<String, List<Map<String, dynamic>>?>? streams = await downloadStreams[downloadType];
+          final DownloadStream downloadStream = downloadType == DownloadType.hardsub ? download.hardsub : download.softsub;
+
+          final DownloadStreamOptionInfo downloadStreamOptionInfoVideo =
+              (episodeType == EpisodeType.leg ? downloadStream.video.leg : downloadStream.video.dub);
+          // final DownloadStreamOptionInfo downloadStreamOptionInfoAudio =
+          //     (episodeType == EpisodeType.leg ? downloadStream.audio.leg : downloadStream.audio.dub);
+          final DownloadStreamOptionInfo downloadStreamOptionInfoLegenda =
+              (episodeType == EpisodeType.leg ? downloadStream.legenda.leg : downloadStream.legenda.dub);
+
+          if (streams != null) {
+            downloadStreamOptionInfoVideo.url =
+                _toStaticLink(getAdaptUrl(streams["VIDEO"]!, min: qualidade == QualidadeDownload.melhor ? false : true));
+            downloadStreamOptionInfoVideo.type = "mp4";
+
+            // if (streams["AUDIO"] != null && downloadType == DownloadType.softsub) {
+            //   downloadStreamOptionInfoAudio.url = streams["AUDIO"]![0]["url"];
+            //   downloadStreamOptionInfoAudio.type = "aac";
+            //   if (episodeType == EpisodeType.dub && download.tipo == MediaType.dual) {
+            //     downloadStream.video.dub.url = null;
+            //     downloadStream.video.dub.type = null;
+            //   }
+            // }
+          } else {
+            downloadStreamOptionInfoVideo.url =
+                result["streams"]["vo_adaptive_hls"][_getIdiomaString(downloadType == DownloadType.hardsub ? null : idiomaType)]["url"];
+            downloadStreamOptionInfoVideo.type = "m3u8";
+          }
+
+          try {
+            if (downloadType == DownloadType.softsub) {
+              downloadStreamOptionInfoLegenda.url = _toStaticLink(result["subtitles"][_getIdiomaString(idiomaType)]["url"]);
+              downloadStreamOptionInfoLegenda.type = result["subtitles"][_getIdiomaString(idiomaType)]["format"].toString().toLowerCase();
+            }
+          } catch (e) {
+            debugPrint("Erro ao pegar legenda: ${episodeType.name}");
+            if (episodeType == EpisodeType.leg) {
+              rethrow;
+            }
+          }
+        }
       }
-      episodio.download = download;
-      return episodio;
+      return download;
     } catch (e) {
       debugPrint(e.toString());
       rethrow;

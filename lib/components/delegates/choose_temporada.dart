@@ -37,7 +37,7 @@ class ChooseTemporada extends SliverPersistentHeaderDelegate {
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                   child: Container(
-                    decoration: BoxDecoration(color: appGreyColor.withOpacity(0.6)),
+                    decoration: BoxDecoration(color: appSecondaryColor.withOpacity(0.6)),
                   ),
                 ),
               ),
