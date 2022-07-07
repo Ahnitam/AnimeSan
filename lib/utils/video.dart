@@ -17,10 +17,9 @@ Future<Map<String, List<Map<String, dynamic>>?>?> getStreams(String link, {requi
           final audio = RegExp(r'EXT.+TYPE=AUDIO.+').firstMatch(results);
           if (audio != null) {
             final audioTemp = RegExp(r'https://.+').firstMatch(audio.group(0)!.replaceAll("\"", ""));
-            streams["AUDIO"] = [];
-            streams["AUDIO"]!.add(
+            streams["AUDIO"] = [
               {"url": audioTemp!.group(0)},
-            );
+            ];
           }
         }
         final streamsTemp = RegExp(r'EXT-X-STREAM-INF.+\n.+').allMatches(results);
@@ -48,7 +47,7 @@ Future<Map<String, List<Map<String, dynamic>>?>?> getStreams(String link, {requi
   }
 }
 
-Future<String> getAdaptUrl(List<Map<String, dynamic>> streams, {bool min = false}) async {
+String getAdaptUrl(List<Map<String, dynamic>> streams, {bool min = false}) {
   Map<String, dynamic>? stream;
   if (min) {
     for (var s in streams) {

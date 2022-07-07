@@ -13,7 +13,7 @@ enum SearchState {
   error,
 }
 
-enum AnimeState {
+enum MidiaState {
   inicial,
   carregando,
   carregado,
