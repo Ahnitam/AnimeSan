@@ -1,4 +1,5 @@
 // import 'package:animesan/utils/types.dart';
+import 'package:animesan/utils/types.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -6,6 +7,7 @@ class SettingsController extends GetxController {
   late final SharedPreferences _prefer;
 
   late bool _forceDualAudio;
+  DownloadType _downloadType = DownloadType.softsub;
   // late QualidadeDownload qualidadeDownload;
 
   SettingsController({
@@ -30,5 +32,12 @@ class SettingsController extends GetxController {
   set forceDualAudio(bool value) {
     _forceDualAudio = value;
     _prefer.setBool("forceDualAudio", value);
+  }
+
+  DownloadType get downloadType => _downloadType;
+
+  set downloadType(DownloadType value) {
+    _downloadType = value;
+    // _prefer.setBool("forceDualAudio", value);
   }
 }

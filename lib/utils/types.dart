@@ -10,4 +10,12 @@ enum ImageType { poster, wide, thumb }
 
 enum StreamType { video, audio, legenda }
 
-enum EpisodeType { leg, dub }
+enum EpisodeType {
+  leg(label: "Legendado", name: "LEG"),
+  dub(label: "Dublado", name: "DUB");
+
+  const EpisodeType({required this.label, required this.name});
+
+  final String label;
+  final String name;
+}

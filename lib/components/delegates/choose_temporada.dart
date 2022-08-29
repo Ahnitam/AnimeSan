@@ -2,33 +2,36 @@ import 'dart:ui';
 
 import 'package:animesan/components/custom_buttom.dart';
 import 'package:animesan/components/dialogs/item_select_dialog.dart';
-import 'package:animesan/models/anime.dart';
 import 'package:animesan/models/temporada.dart';
 import 'package:animesan/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ChooseTemporada extends SliverPersistentHeaderDelegate {
-  final double expandedHeight;
+  late final double _expandedHeight;
 
-  final Anime anime;
-
+  final List<Temporada> _temporadas;
   late final Rx<Temporada?> selectedTemporada;
 
+  final double height;
+  final EdgeInsets margin;
+
   ChooseTemporada({
-    this.expandedHeight = 75,
-    required this.anime,
+    this.height = 55,
+    this.margin = const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
+    required List<Temporada> temporadas,
     required this.selectedTemporada,
-  });
+  })  : _temporadas = temporadas,
+        _expandedHeight = height + margin.top + margin.bottom;
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
+      padding: margin,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: SizedBox(
-          height: expandedHeight,
+          height: height,
           width: double.infinity,
           child: Stack(
             fit: StackFit.loose,
@@ -51,10 +54,10 @@ class ChooseTemporada extends SliverPersistentHeaderDelegate {
                         borderRadius: BorderRadius.zero,
                         width: 60,
                         color: Colors.transparent,
-                        onPressed: anime.temporadas.indexOf(selectedTemporada.value!) != 0 ? previusTemporada : null,
+                        onPressed: _temporadas.indexOf(selectedTemporada.value!) != 0 ? previusTemporada : null,
                         child: Icon(
                           Icons.arrow_back_ios,
-                          color: anime.temporadas.indexOf(selectedTemporada.value!) != 0 ? Colors.white : appGreyColor,
+                          color: _temporadas.indexOf(selectedTemporada.value!) != 0 ? Colors.white : appGreyColor,
                         ),
                       ),
                       Expanded(
@@ -63,11 +66,11 @@ class ChooseTemporada extends SliverPersistentHeaderDelegate {
                           borderRadius: BorderRadius.zero,
                           color: Colors.transparent,
                           height: double.infinity,
-                          onPressed: anime.temporadas.length > 1
+                          onPressed: _temporadas.length > 1
                               ? () => Get.dialog(
                                     ItemSelectDialog<Temporada>(
                                       selectedItem: selectedTemporada.value,
-                                      items: anime.temporadas,
+                                      items: _temporadas,
                                       onSelect: (temporada) => selectedTemporada.value = temporada,
                                       itemBuilder: (temporada) => Text(
                                         temporada.titulo,
@@ -102,11 +105,11 @@ class ChooseTemporada extends SliverPersistentHeaderDelegate {
                         borderRadius: BorderRadius.zero,
                         width: 60,
                         color: Colors.transparent,
-                        onPressed: anime.temporadas.indexOf(selectedTemporada.value!) != anime.temporadas.length - 1 ? nextTemporada : null,
+                        onPressed: _temporadas.indexOf(selectedTemporada.value!) != _temporadas.length - 1 ? nextTemporada : null,
                         child: Center(
                           child: Icon(
                             Icons.arrow_forward_ios,
-                            color: anime.temporadas.indexOf(selectedTemporada.value!) != anime.temporadas.length - 1 ? Colors.white : appGreyColor,
+                            color: _temporadas.indexOf(selectedTemporada.value!) != _temporadas.length - 1 ? Colors.white : appGreyColor,
                           ),
                         ),
                       ),
@@ -122,18 +125,18 @@ class ChooseTemporada extends SliverPersistentHeaderDelegate {
   }
 
   void previusTemporada() {
-    selectedTemporada.value = anime.temporadas[anime.temporadas.indexOf(selectedTemporada.value!) - 1];
+    selectedTemporada.value = _temporadas[_temporadas.indexOf(selectedTemporada.value!) - 1];
   }
 
   void nextTemporada() {
-    selectedTemporada.value = anime.temporadas[anime.temporadas.indexOf(selectedTemporada.value!) + 1];
+    selectedTemporada.value = _temporadas[_temporadas.indexOf(selectedTemporada.value!) + 1];
   }
 
   @override
-  double get maxExtent => expandedHeight;
+  double get maxExtent => _expandedHeight;
 
   @override
-  double get minExtent => expandedHeight;
+  double get minExtent => _expandedHeight;
 
   @override
   bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) => true;

@@ -4,7 +4,9 @@ import 'package:animesan/models/download.dart';
 import 'package:animesan/models/episodio.dart';
 import 'package:animesan/models/anime.dart';
 import 'package:animesan/models/login/field.dart';
+import 'package:animesan/modules/StreamModule/crunchyroll/login.dart';
 import 'package:animesan/models/login/login_form.dart';
+import 'package:animesan/models/login/login.dart';
 import 'package:animesan/models/mixins.dart';
 import 'package:animesan/models/module.dart';
 import 'package:animesan/models/temporada.dart';
@@ -16,32 +18,37 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class CrunchyrollModule extends Module with StreamModule {
-  CrunchyrollModule()
-      : super(
-          loginForms: [
-            LoginForm(
-              id: "username_password",
-              name: "Email/Password",
-              fields: {
-                "username_email": Field(
-                  name: "Username/Email",
-                  inputType: TextInputType.emailAddress,
-                  isVisible: true,
-                  autoFills: [AutofillHints.email, AutofillHints.username],
-                ),
-                "password": Field(
-                  name: "Senha",
-                  inputType: TextInputType.text,
-                  isVisible: false,
-                  autoFills: [AutofillHints.password],
-                ),
-              },
-            ),
-          ],
-        );
+  final LoginCrunchyroll _login = LoginCrunchyroll();
 
   final String userAgent = "Crunchyroll";
   final String authorization = "Basic bzl5aDQ2empyZjc2Z2xjY25wMWw6SnFtZWZoX1Vzc2RBMHV4YVJjTlJtSlBBS255SnRwaTQ=";
+
+  CrunchyrollModule(super.loginController);
+
+  @override
+  Login get login => _login;
+
+  @override
+  List<LoginForm> get loginForms => [
+        LoginForm(
+          id: "username_password",
+          name: "Email/Password",
+          fields: {
+            "username_email": LoginFormField(
+              label: "Username/Email",
+              inputType: TextInputType.emailAddress,
+              isVisible: true,
+              autoFills: [AutofillHints.email, AutofillHints.username],
+            ),
+            "password": LoginFormField(
+              label: "Senha",
+              inputType: TextInputType.text,
+              isVisible: false,
+              autoFills: [AutofillHints.password],
+            ),
+          },
+        ),
+      ];
 
   @override
   String get id => "crunchyroll";
@@ -59,10 +66,16 @@ class CrunchyrollModule extends Module with StreamModule {
   String get icon => "assets/streams/cr_logo.svg";
 
   @override
-  Future<void> logar(String loginForm) async {
-    LoginForm form = loginForms.firstWhere((form) => form.id == loginForm);
-    if (loginForm == "username_password") {
-      await _loginWithEmail(form.fields["username_email"]!.value, form.fields["password"]!.value);
+  Future<void> logar(String loginForm, Map<String, String> fields) async {
+    try {
+      LoginForm form = loginForms.firstWhere((form) => form.id == loginForm);
+      _login.loginForm = loginForm;
+      if (loginForm == "username_password") {
+        await _loginWithEmail(fields[form.fields.keys.elementAt(0)]!, fields[form.fields.keys.elementAt(1)]!);
+      }
+    } catch (e) {
+      await logout();
+      rethrow;
     }
   }
 
@@ -80,14 +93,13 @@ class CrunchyrollModule extends Module with StreamModule {
           "Authorization": authorization,
         },
         body: {
-          "token": login.getField("refresh_token"),
+          "token": _login.refreshToken.value,
         },
       );
+      _login.logout();
     } catch (e) {
       debugPrint(e.toString());
     }
-
-    return;
   }
 
   _loginWithEmail(String email, String senha) async {
@@ -111,9 +123,9 @@ class CrunchyrollModule extends Module with StreamModule {
 
     if (response.statusCode >= 200 && response.statusCode <= 299) {
       var result = jsonDecode(utf8.decode(response.bodyBytes));
-      login.putField(id: "username", name: "Username", value: email, isVisible: true);
-      login.putField(id: "refresh_token", name: "", value: result["refresh_token"], isVisible: false);
-      login.putField(id: "access_token", name: "", value: result["access_token"], isVisible: false);
+      _login.senha.value = senha;
+      _login.refreshToken.value = result["refresh_token"];
+      _login.accessToken.value = result["access_token"];
       await _infoProfile();
       await _getidExternal();
       await _plano();
@@ -132,13 +144,14 @@ class CrunchyrollModule extends Module with StreamModule {
       ),
       headers: {
         "User-Agent": userAgent,
-        "Authorization": "Bearer ${login.getField("access_token")}",
+        "Authorization": "Bearer ${_login.accessToken.value}",
       },
     );
 
     if (response.statusCode >= 200 && response.statusCode <= 299) {
       var result = jsonDecode(utf8.decode(response.bodyBytes));
-      login.putField(id: "username", name: "Username", value: result["username"] ?? result["email"], isVisible: true);
+      _login.username.value = result["username"];
+      _login.email.value = result["email"];
       return;
     }
     throw Exception("Error get profile");
@@ -154,13 +167,13 @@ class CrunchyrollModule extends Module with StreamModule {
       ),
       headers: {
         "User-Agent": userAgent,
-        "Authorization": "Bearer ${login.getField("access_token")}",
+        "Authorization": "Bearer ${_login.accessToken.value}",
       },
     );
 
     if (response.statusCode >= 200 && response.statusCode <= 299) {
       var result = jsonDecode(utf8.decode(response.bodyBytes));
-      login.putField(id: "external_id", name: "", value: result["external_id"], isVisible: false);
+      _login.externalId.value = result["external_id"];
       return;
     }
     throw Exception("Erro get external id");
@@ -172,17 +185,17 @@ class CrunchyrollModule extends Module with StreamModule {
       Uri(
         scheme: "https",
         host: apiUrl,
-        path: "/subs/v1/subscriptions/${login.getField("external_id")}/benefits",
+        path: "/subs/v1/subscriptions/${_login.externalId.value}/benefits",
       ),
       headers: {
         "User-Agent": userAgent,
-        "Authorization": "Bearer ${login.getField("access_token")}",
+        "Authorization": "Bearer ${_login.accessToken.value}",
       },
     );
 
     if (response.statusCode >= 200 && response.statusCode <= 299) {
       var result = jsonDecode(utf8.decode(response.bodyBytes));
-      login.putField(id: "plano", name: "Plano", value: (result["total"] != 0) ? "Premium" : "Free", isVisible: true);
+      _login.plano.value = (result["total"] != 0) ? "Premium" : "Free";
       return;
     }
     throw Exception("Error get plano");
@@ -201,26 +214,33 @@ class CrunchyrollModule extends Module with StreamModule {
       },
       body: {
         "grant_type": "refresh_token",
-        "refresh_token": login.getField("refresh_token"),
+        "refresh_token": _login.refreshToken.value,
         "scope": "offline_access",
       },
     );
-    if (response.statusCode >= 200 && response.statusCode <= 299) {
+    if (response.statusCode == 200) {
       var result = jsonDecode(utf8.decode(response.bodyBytes));
-      login.putField(id: "refresh_token", name: "", value: result["refresh_token"], isVisible: false);
-      login.putField(id: "access_token", name: "", value: result["access_token"], isVisible: false);
+      _login.accessToken.value = result["access_token"];
+      _login.refreshToken.value = result["refresh_token"];
       return;
-    } else {
-      login.logout();
+    } else if (response.statusCode == 400 && _login.loginForm == "username_password") {
+      LoginForm form = loginForms.firstWhere((form) => form.id == _login.loginForm);
+      await logar(_login.loginForm!, {form.fields.keys.elementAt(0): _login.email.value, form.fields.keys.elementAt(1): _login.senha.value});
+      return;
     }
     throw Exception("Erro get token");
   }
 
   @override
   Future<void> refreshLogin() async {
-    await _infoProfile();
-    await _getidExternal();
-    await _plano();
+    try {
+      await _infoProfile();
+      await _getidExternal();
+      await _plano();
+    } catch (e) {
+      debugPrint(e.toString());
+      rethrow;
+    }
   }
 
   Future<Map<String, dynamic>> _cms() async {
@@ -233,7 +253,7 @@ class CrunchyrollModule extends Module with StreamModule {
       ),
       headers: {
         "User-Agent": userAgent,
-        "Authorization": "Bearer ${login.getField("access_token")}",
+        "Authorization": "Bearer ${_login.accessToken.value}",
       },
     );
     if (response.statusCode >= 200 && response.statusCode <= 299) {
@@ -255,7 +275,7 @@ class CrunchyrollModule extends Module with StreamModule {
       ),
       headers: {
         "User-Agent": userAgent,
-        "Authorization": "Bearer ${login.getField("access_token")}",
+        "Authorization": "Bearer ${_login.accessToken.value}",
       },
     );
     if (response.statusCode >= 200 && response.statusCode <= 299) {
@@ -323,19 +343,17 @@ class CrunchyrollModule extends Module with StreamModule {
       for (var item in result["items"]) {
         final Temporada temporada = Temporada(
           id: item["id"],
-          tipo: item["is_dubbed"] ? MediaType.dub : MediaType.leg,
+          tipo: item["is_dubbed"] ? EpisodeType.dub : EpisodeType.leg,
           titulo: item["title"],
           numero: formatterNum(item["season_number"].toString())!,
           anime: anime,
         );
-        if (item["is_dubbed"]) {
-          if (RegExp(r'.+-portuguese-dub$').hasMatch(item["slug_title"])) {
-            await _getEpisodios(temporada, cms);
-            anime.temporadas.add(temporada);
-          }
-        } else {
+        if (temporada.tipo == EpisodeType.leg || RegExp(r'.+-portuguese-dub$').hasMatch(item["slug_title"])) {
           await _getEpisodios(temporada, cms);
           anime.temporadas.add(temporada);
+          if (!anime.temporadasEpisodeTypes.contains(temporada.tipo)) {
+            anime.temporadasEpisodeTypes.add(temporada.tipo);
+          }
         }
       }
       return anime;
@@ -370,16 +388,17 @@ class CrunchyrollModule extends Module with StreamModule {
           descricao: item["description"],
           mediasId: item["is_dubbed"]
               ? {
-                  EpisodeType.dub: (!item["is_premium_only"] || (login.state.value == LoginState.logado && login.getField("plano") == "Premium"))
+                  EpisodeType.dub: (!item["is_premium_only"] || (login.state.value == LoginState.logado && _login.plano.value == "Premium"))
                       ? item["__links__"]["streams"]["href"]
                       : "",
                 }
               : {
-                  EpisodeType.leg: (!item["is_premium_only"] || (login.state.value == LoginState.logado && login.getField("plano") == "Premium"))
+                  EpisodeType.leg: (!item["is_premium_only"] || (login.state.value == LoginState.logado && _login.plano.value == "Premium"))
                       ? item["__links__"]["streams"]["href"]
                       : "",
                 },
           isPremium: item["is_premium_only"],
+          downloadPermitido: (!item["is_premium_only"] || (login.state.value == LoginState.logado && _login.plano.value == "Premium")) ? true : false,
           duracao: Duration(milliseconds: item["duration_ms"]),
           imageUrl: _getImageUrl(item["images"], imageType: ImageType.thumb),
           numero: formatterNum(item["episode_number"]?.toString()) ?? "00",
@@ -434,6 +453,14 @@ class CrunchyrollModule extends Module with StreamModule {
     }
   }
 
+  String _getUrlStream(Map<String, dynamic> result, IdiomaType? idiomaType) {
+    try {
+      return result["streams"]["vo_adaptive_hls"][_getIdiomaString(idiomaType)]["url"];
+    } catch (e) {
+      return result["streams"]["vo_adaptive_hls"][_getIdiomaString(null)]["url"];
+    }
+  }
+
   @override
   Future<Download> fetchDownloadInfo({
     required Episodio episodio,
@@ -460,8 +487,8 @@ class CrunchyrollModule extends Module with StreamModule {
         final result = await _getStreamVideo(episodio.mediasId[episodeType]!, idiomaType: idiomaType);
 
         Map<DownloadType, Future<Map<String, List<Map<String, dynamic>>?>?>> downloadStreams = {
-          DownloadType.hardsub: getStreams(result["streams"]["vo_adaptive_hls"][_getIdiomaString(idiomaType)]["url"], headers: null),
-          DownloadType.softsub: getStreams(result["streams"]["vo_adaptive_hls"][_getIdiomaString(null)]["url"], headers: null),
+          DownloadType.hardsub: getStreams(_getUrlStream(result, idiomaType), headers: null),
+          DownloadType.softsub: getStreams(_getUrlStream(result, null), headers: null),
         };
 
         for (var downloadType in downloadStreams.keys) {

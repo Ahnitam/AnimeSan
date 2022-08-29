@@ -9,6 +9,7 @@ class Episodio {
   final String titulo;
   final String descricao;
   final bool isPremium;
+  final bool downloadPermitido;
   final Duration duracao;
   final String numero;
   final Temporada temporada;
@@ -26,6 +27,7 @@ class Episodio {
     required this.descricao,
     required this.temporada,
     required this.numero,
+    required this.downloadPermitido,
     required String? imageUrl,
     this.download,
   }) : imageUrl = imageUrl ?? "";

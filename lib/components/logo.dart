@@ -27,7 +27,7 @@ class AnimeSanLogo extends StatefulWidget {
 
 class _AnimeSanLogoState extends State<AnimeSanLogo> with TickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
-    duration: const Duration(seconds: 3),
+    duration: const Duration(milliseconds: 1500),
     vsync: this,
   );
   late final Animation<double> _animation = CurvedAnimation(
@@ -36,7 +36,7 @@ class _AnimeSanLogoState extends State<AnimeSanLogo> with TickerProviderStateMix
   );
   @override
   Widget build(BuildContext context) {
-    widget.loading ? _controller.repeat() : _controller.reset();
+    widget.loading ? _controller.repeat() : _controller.forward();
     return Padding(
       padding: widget.margin,
       child: Row(

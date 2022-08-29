@@ -1,6 +1,7 @@
 import 'package:animesan/models/module.dart';
 import 'package:animesan/models/temporada.dart';
 import 'package:animesan/utils/states.dart';
+import 'package:animesan/utils/types.dart';
 import 'package:get/get.dart';
 
 class Anime {
@@ -9,6 +10,7 @@ class Anime {
   final String descricao;
   final Module module;
   final String imageUrl;
+  final List<EpisodeType> temporadasEpisodeTypes = List.empty(growable: true);
   final List<Temporada> temporadas;
   final Rx<MidiaState> state = Rx<MidiaState>(MidiaState.inicial);
 
@@ -26,11 +28,9 @@ class Anime {
     String? id,
     String? titulo,
     String? descricao,
-    String? streamId,
     String? imageUrl,
     Module? module,
     List<Temporada>? temporadas,
-    String? streamName,
   }) {
     return Anime(
       id: id ?? this.id,

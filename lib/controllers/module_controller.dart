@@ -1,20 +1,26 @@
+import 'dart:convert';
+
+import 'package:animesan/controllers/settings_controller.dart';
+import 'package:animesan/models/login/login.dart';
 import 'package:animesan/models/mixins.dart';
 import 'package:animesan/models/module.dart';
-import 'package:animesan/modules/StreamModule/crunchyroll.dart';
+import 'package:animesan/modules/StreamModule/crunchyroll/crunchyroll.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ModuleController {
-  final List<Module> _modules = [CrunchyrollModule()];
-  late final SharedPreferences _prefer;
+  late final List<Module> _modules;
+  final SharedPreferences _prefer;
 
   final Rx<StreamModule?> _selectedStreamModule = Rx<StreamModule?>(null);
   final Rx<InfoModule?> _selectedInfoModule = Rx<InfoModule?>(null);
   final Rx<StreamModule?> _streamPadrao = Rx<StreamModule?>(null);
   final Rx<InfoModule?> _infoPadrao = Rx<InfoModule?>(null);
 
-  ModuleController({required SharedPreferences prefer}) {
-    _prefer = prefer;
+  ModuleController({required SharedPreferences prefer}) : _prefer = prefer {
+    _modules = [
+      CrunchyrollModule(this),
+    ];
     _verifyModules();
   }
 
@@ -114,5 +120,9 @@ class ModuleController {
     } else {
       throw Exception("Modulo não suportado");
     }
+  }
+
+  void saveLoginSettings(Login login) async {
+    await _prefer.setString(login.id, json.encode(login.toJson()));
   }
 }

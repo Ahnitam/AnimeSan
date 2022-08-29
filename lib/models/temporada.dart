@@ -6,7 +6,7 @@ class Temporada {
   final String id;
   final String titulo;
   final String numero;
-  final MediaType tipo;
+  final EpisodeType tipo;
   final List<Episodio> episodios;
 
   final Anime anime;

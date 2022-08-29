@@ -19,3 +19,9 @@ enum MidiaState {
   carregado,
   error,
 }
+
+enum ExternalIdState {
+  inicial,
+  carregando,
+  carregado,
+}

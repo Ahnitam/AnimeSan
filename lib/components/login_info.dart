@@ -12,7 +12,7 @@ class LoginInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Field> visibleFields = module.login.getVisibleFields();
+    final List<LoginField> visibleFields = module.login.visibleFields;
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -32,7 +32,7 @@ class LoginInfo extends StatelessWidget {
                     Expanded(
                       flex: 2,
                       child: Text(
-                        "${visibleFields[index].name}: ",
+                        "${visibleFields[index].label}: ",
                         style: const TextStyle(
                           fontFamily: "Bree Serif",
                           fontSize: 14,

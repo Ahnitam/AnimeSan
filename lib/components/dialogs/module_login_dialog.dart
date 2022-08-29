@@ -9,6 +9,7 @@ import 'package:animesan/models/module.dart';
 import 'package:animesan/utils/colors.dart';
 import 'package:animesan/utils/states.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 class ModuleLoginDialog extends StatelessWidget {
@@ -76,7 +77,7 @@ class ModuleLoginDialog extends StatelessWidget {
     );
   }
 
-  Widget textField(Field field, TextEditingController textController) {
+  Widget textField(LoginFormField field, TextEditingController textController) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Container(
@@ -101,7 +102,7 @@ class ModuleLoginDialog extends StatelessWidget {
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.fromLTRB(10, 10, 10, 0.0),
               isDense: true,
-              labelText: field.name,
+              labelText: field.label,
               labelStyle: const TextStyle(
                 fontFamily: "Bree Serif",
                 color: Colors.white,
@@ -136,6 +137,8 @@ class ModuleLoginDialog extends StatelessWidget {
       controllers.add(textController);
       widgets.add(textField(field, textController));
     }
+
+    Map<String, String> fields = {};
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       mainAxisSize: MainAxisSize.max,
@@ -188,11 +191,19 @@ class ModuleLoginDialog extends StatelessWidget {
           child: Center(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: widgets,
-              ),
+              child: widgets.length > 1
+                  ? AutofillGroup(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: widgets,
+                      ),
+                    )
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: widgets,
+                    ),
             ),
           ),
         ),
@@ -203,10 +214,11 @@ class ModuleLoginDialog extends StatelessWidget {
             height: 40,
             width: 150,
             onPressed: () {
+              TextInput.finishAutofillContext();
               for (int i = 0; i < _selectedLoginForm.value!.fields.length; i++) {
-                _selectedLoginForm.value!.fields[_selectedLoginForm.value!.fields.keys.elementAt(i)]!.value = controllers[i].text;
+                fields[_selectedLoginForm.value!.fields.keys.elementAt(i)] = controllers[i].text;
               }
-              _loginController.logar(module, _selectedLoginForm.value!.id);
+              _loginController.logar(module, _selectedLoginForm.value!.id, fields);
             },
             child: const Text(
               "Login",

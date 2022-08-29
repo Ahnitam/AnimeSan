@@ -1,33 +1,27 @@
 import 'package:flutter/material.dart';
 
-class Field {
-  String name;
+class LoginField {
+  final String _label;
   dynamic value;
-  bool isVisible;
-  TextInputType inputType;
+
+  LoginField({
+    required String label,
+    this.value,
+  }) : _label = label;
+
+  String get label => _label;
+}
+
+class LoginFormField {
+  final String label;
+  final bool isVisible;
+  final TextInputType inputType;
   final List<String> autoFills;
 
-  Field({
-    required this.name,
-    this.value = "",
-    this.isVisible = false,
-    this.inputType = TextInputType.text,
-    this.autoFills = const [],
+  LoginFormField({
+    required this.label,
+    required this.isVisible,
+    required this.inputType,
+    required this.autoFills,
   });
-
-  factory Field.fromJson(Map<String, dynamic> json) {
-    return Field(
-      name: json["name"],
-      value: json["value"],
-      isVisible: json["isVisible"],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      "name": name,
-      "value": value,
-      "isVisible": isVisible,
-    };
-  }
 }
