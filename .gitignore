@@ -1,5 +1,8 @@
 # See https://www.dartlang.org/guides/libraries/private-files
 
+android/app/google-services.json
+ios/firebase_app_id_file.json
+
 # If you're building an application, you may want to check-in your pubspec.lock
 lib/firebase_options.dart
 pubspec.lock
